@@ -13,6 +13,7 @@
 #include "../Data/notes.h"
 #include "../LcdDisplay/display.h"
 #include "../common/config.h"
+#include "../Input/input.h"
 
 inline void demoRandomDisplayBitmapRandom()
 {
@@ -232,3 +233,22 @@ void demoBaseTime()
 //	++numberOfTimer0Interupts;
 //	//TIFR0 = 0x01;
 //}
+
+void demoReadKeys()
+{
+	static char buffer[32] = {};
+	//uint8_t up = 0, down = 0, left = 0, right = 0, select = 0;
+	DDRC &= 0b1111110;
+	DDRB &= 0b1111110;
+		
+	while(1)
+	{
+		//read_key(INPUT_BUTTON_SELECT, PINC)
+		sprintf(buffer, "Stan klawisza UP: '%1d'", read_key(INPUT_BUTTON_UP, PINB)), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza DOWN: '%1d'", read_key(INPUT_BUTTON_DOWN, PINB)), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza LEFT: '%1d'", read_key(INPUT_BUTTON_LEFT, PINB)), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza RIGHT: '%1d'", read_key(INPUT_BUTTON_RIGHT, PINB)), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza START: '%1.d'", read_key(INPUT_BUTTON_START, PINC)), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza SELECT: '%1d'", read_key(INPUT_BUTTON_SELECT, PINC)), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
+	}
+}

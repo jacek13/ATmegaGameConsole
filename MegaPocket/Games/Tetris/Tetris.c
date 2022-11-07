@@ -6,10 +6,19 @@
 
 //#define random() rand()
 
+// Time base
 volatile uint8_t numberOfTimer0Interupts;
 volatile uint8_t tetrisGameLoop;
 volatile uint16_t numberOfMiliseconds;
 volatile uint16_t numberOfSeconds;
+
+// Input
+volatile uint8_t ButtonUp;
+volatile uint8_t ButtonDown;
+volatile uint8_t ButtonLeft;
+volatile uint8_t ButtonRight;
+volatile uint8_t ButtonStart;
+volatile uint8_t ButtonSelect;
 
 inline Tetromino generateTile() { return (Tetromino)(random() % NumberOfTetrominos); }
 
@@ -50,6 +59,7 @@ void TetrisRun()
 void TetrisLoop(/*olc::PixelGameEngine* engine, */ struct Board* board, struct Tile* tetromino, struct Tile* bufferTetromino, uint8_t * elapsedTimeSum)
 {
 	uint16_t bufferScore = board->score;
+	collisionType collision = COLLISION_NONE;
 	ButtonType input = BUTTON_NONE;
 	bufferTetromino->x = tetromino->x;
 	bufferTetromino->y = tetromino->y;
@@ -61,10 +71,11 @@ void TetrisLoop(/*olc::PixelGameEngine* engine, */ struct Board* board, struct T
 		tetromino->Type = TetrisRotateTetromino(tetromino->Type);
 		if (TetrisCheckForCollision(board, tetromino)) tetromino->Type = bufferTetromino->Type;
 	}
-	TetrisHandleCollision(board, tetromino, input);
+	if (input == BUTTON_RESET) TetrisHandleGameOver(board, tetromino);
+	collision = TetrisHandleCollision(board, tetromino, input);
 	TetrisUpdateGameLogic(board, tetromino, elapsedTimeSum);
 
-	if (TetrisHandleCollision(board, tetromino, BUTTON_DOWN))
+	if (collision = TetrisHandleCollision(board, tetromino, BUTTON_DOWN))
 	{
 		TetrisMapCurrentTileToArea(board, tetromino);
 		TetrisMakeNewTile(tetromino);
@@ -75,7 +86,7 @@ void TetrisLoop(/*olc::PixelGameEngine* engine, */ struct Board* board, struct T
 	//TetrisDrawMap(/*engine,*/ board);
 	//sprintf_s(buffer, "Elapsed: %1.3f\tCurrent tetromino: %d\tFull row: %d\n", elapsedTimeSum += GetElapsedTime(), tetromino->Type, TetrisFindIndexOfFilledRow(&board));
 	//printf(buffer);
-	if ((tetromino->x != bufferTetromino->x) || (tetromino->y != bufferTetromino->y)) TetrisDrawMap(/*engine,*/ board), TetrisDrawCurrentTile(/*engine,*/ tetromino, bufferTetromino);
+	if ((tetromino->x != bufferTetromino->x) || (tetromino->y != bufferTetromino->y) || (tetromino->Type != bufferTetromino->Type)) TetrisDrawCurrentTile(/*engine,*/ tetromino, bufferTetromino, collision);
 	
 	if (board->score != bufferScore) TetrisDrawScore(board->score);
 	//bufferString.clear();
@@ -108,6 +119,7 @@ void TetrisCleanBoard(struct Board* board)
 	for (unsigned int i = 0; i < board->rows + 1; i++)
 		for (unsigned int j = 0; j <= (board->columns + 1); j++)
 			board->area[i][j] = map[i][j];
+	board->score = 0;
 }
 
 void TetrisMakeNewTile(struct Tile* tetromino)
@@ -127,13 +139,23 @@ void TetrisFreeMemory(struct Board* board)
 ButtonType TetrisHandleInput(/*olc::PixelGameEngine* engine,*/ struct Tile * tetromino, unsigned int maxRows, unsigned int maxColumns)
 {
 	ButtonType input = BUTTON_NONE;
-	/* Check Pin State */ //if (engine->GetKey(olc::UP).bPressed && tetromino->y >= 1) tetromino->y--, input = BUTTON_UP;
-	/* Check Pin State */ //if (engine->GetKey(olc::DOWN).bPressed && tetromino->y < maxRows) tetromino->y++, input = BUTTON_DOWN;
-	/* Check Pin State */ //if (engine->GetKey(olc::LEFT).bPressed && tetromino->x >= 1) tetromino->x--, input = BUTTON_LEFT;
-	/* Check Pin State */ //if (engine->GetKey(olc::RIGHT).bPressed && tetromino->x < maxColumns) tetromino->x++, input = BUTTON_RIGHT;
-	/* Check Pin State */ //if (engine->GetKey(olc::SPACE).bPressed) input = BUTTON_ROTATE;
+	#ifdef __cplusplus
+	/* Check Pin State */ if (engine->GetKey(olc::UP).bPressed && tetromino->y >= 1) tetromino->y--, input = BUTTON_UP;
+	/* Check Pin State */ if (engine->GetKey(olc::DOWN).bPressed && tetromino->y < maxRows) tetromino->y++, input = BUTTON_DOWN;
+	/* Check Pin State */ if (engine->GetKey(olc::LEFT).bPressed && tetromino->x >= 1) tetromino->x--, input = BUTTON_LEFT;
+	/* Check Pin State */ if (engine->GetKey(olc::RIGHT).bPressed && tetromino->x < maxColumns) tetromino->x++, input = BUTTON_RIGHT;
+	/* Check Pin State */ if (engine->GetKey(olc::SPACE).bPressed) input = BUTTON_ROTATE;
 	//if (engine->GetKey(olc::G).bPressed) makeNewTile();
 	//if (engine->GetKey(olc::D).bPressed) drawCurrentTile();
+	#else
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_UP, PINB) && tetromino->y >= 1) ButtonSelect = 0, tetromino->y--, input = BUTTON_UP;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_DOWN, PINB) && tetromino->y < maxRows) ButtonSelect = 0, tetromino->y++, input = BUTTON_DOWN;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_LEFT, PINB) && tetromino->x >= 1) ButtonSelect = 0, tetromino->x--, input = BUTTON_LEFT;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_RIGHT, PINB)  && tetromino->x < maxColumns)ButtonSelect = 0, tetromino->x++, input = BUTTON_RIGHT;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_START, PINC)) input = BUTTON_RESET;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_SELECT, PINC) && !ButtonSelect) ButtonSelect = 1, input = BUTTON_ROTATE;
+	else if (!read_key(INPUT_BUTTON_SELECT, PINC) && ButtonSelect) ButtonSelect = 0;
+	#endif
 	return input;
 }
 
@@ -220,7 +242,7 @@ int TetrisHandleCollision(struct Board* board, struct Tile* tetromino, ButtonTyp
 void TetrisUpdateGameLogic(struct Board* board, struct Tile* tetromino, uint8_t * elapsedTimeSum)
 {
 	 //TODO base time not working
-	 if (*elapsedTimeSum >= 1)
+	 if (*elapsedTimeSum >= 2)
 	 {
 		tetromino->y++;
 		*elapsedTimeSum = 0;
@@ -230,6 +252,7 @@ void TetrisUpdateGameLogic(struct Board* board, struct Tile* tetromino, uint8_t 
 	if (indexOfRowToClear = TetrisFindIndexOfFilledRow(board))
 	{
 		board->score += TetrisUpdateBoard(board, indexOfRowToClear);
+		TetrisDrawMap(board);
 	}
 }
 
@@ -308,7 +331,7 @@ void TetrisDrawMap(/*olc::PixelGameEngine* engine, */ struct Board* board)
 }
 
 // TODO clear bacground by getting x y info from buffer tetromino
-void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetromino, struct Tile* bufferTetromino)
+void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetromino, struct Tile* bufferTetromino, collisionType collision)
 {
 	#ifdef __cplusplus
 	olc::Pixel color = olc::WHITE;
@@ -352,10 +375,12 @@ void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetro
 	#else
 	
 	// Clear previus GRAM area
-	//for (unsigned row = 0; row < 4; row++)
-	//	for (unsigned column = 0; column < 4; column++)
-	//		if ((bufferTetromino->x + column) > 0 && (bufferTetromino->x + column) < 10 && (bufferTetromino->y + row) < 19)
-	//			Display_Draw_Fill_Rect((bufferTetromino->x + column) * CubeWidth, (bufferTetromino->y + row) * CubeHight, CubeWidth, CubeHight, 0x0000);
+	if (!collision)
+		for (unsigned row = 0; row < 4; row++)
+			for (unsigned column = 0; column < 4; column++)
+				if (isTetrominoType(Tetrominos[bufferTetromino->Type][((row * 4) + column)]))
+					if ((bufferTetromino->x + column) > 0 && (bufferTetromino->x + column) <= 10 && (bufferTetromino->y + row) <= 19)
+						Display_Draw_Fill_Rect((bufferTetromino->x + column) * CubeWidth, (bufferTetromino->y + row) * CubeHight, CubeWidth, CubeHight, 0x0000);
 	
 	uint16_t color = 0xFFFF;
 	for (unsigned row = 0; row < 4; row++)
@@ -392,7 +417,7 @@ void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetro
 			default: color = 0xFFFF;
 				break;
 			}
-			if (isTetrominoType(Tetrominos[tetromino->Type][((row * 4) + column)]))
+			if (isTetrominoType(Tetrominos[tetromino->Type][((row * 4) + column)]) && tetromino->x < 10)
 				Display_Draw_Fill_Rect((tetromino->x + column) * CubeWidth, (tetromino->y + row) * CubeHight, CubeWidth, CubeHight, color);
 		}
 		#endif
@@ -409,7 +434,8 @@ void TetrisHandleGameOver(struct Board* board, struct Tile* tetromino)
 	static char buffer[32] = {};
 	Display_Draw_Text_From_Progmem(0, 192, PSTR("Game Over!"), consolas_font, 0xD800, 0x0000);
 	sprintf(buffer, "Final score: %5d", board->score), Display_Draw_Text(0, 208, buffer, consolas_font, 0xEFE0, 0x0000);
-	for(uint16_t i = 0; i < 50000; i++) asm("nop"); // delay
+	for(uint8_t n = 0; n < 64; n++)
+		for(uint16_t i = 0; i < 50000; i++) asm("nop"); // delay
 	Display_Clear_Screen(0x0000);
 	TetrisCleanBoard(board);
 	TetrisDrawMap(/*engine,*/ board);

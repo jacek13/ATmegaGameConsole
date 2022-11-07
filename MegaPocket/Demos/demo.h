@@ -32,4 +32,6 @@ void demoBrightness();
 
 void demoBaseTime();
 
+void demoReadKeys();
+
 #endif /* DEMO_H_ */

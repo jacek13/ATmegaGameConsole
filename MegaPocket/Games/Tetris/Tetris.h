@@ -8,6 +8,7 @@
 #else
 #include "../../LcdDisplay/display.h"
 #include "../../Data/fonts.h"
+#include "../../Input/input.h"
 #endif
 
 void TetrisRun();
@@ -30,7 +31,7 @@ void TetrisMapCurrentTileToArea(struct Board* board, struct Tile* tetromino);
 
 void TetrisDrawMap(/*olc::PixelGameEngine* engine,*/ struct Board* board);
 
-void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine,*/ struct Tile* tetromino, struct Tile* bufferTetromino);
+void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine,*/ struct Tile* tetromino, struct Tile* bufferTetromino, collisionType collision);
 
 void TetrisDrawScore(uint16_t score);
 
