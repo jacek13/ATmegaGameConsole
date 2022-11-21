@@ -225,6 +225,7 @@
     <Folder Include="LcdDisplay\" />
     <Folder Include="Games" />
     <Folder Include="Input" />
+    <Folder Include="System" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

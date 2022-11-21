@@ -11,12 +11,12 @@
 
 #include <avr/io.h>
 
-#define INPUT_BUTTON_UP		(1 << PB0)
-#define INPUT_BUTTON_DOWN	(1 << PB2)
-#define INPUT_BUTTON_LEFT	(1 << PB3)
-#define INPUT_BUTTON_RIGHT	(1 << PB4)
-#define INPUT_BUTTON_START	(1 << PC0)
-#define INPUT_BUTTON_SELECT	(1 << PC1)
+#define INPUT_BUTTON_UP		(1 << PC0)
+#define INPUT_BUTTON_DOWN	(1 << PC1)
+#define INPUT_BUTTON_LEFT	(1 << PC2)
+#define INPUT_BUTTON_RIGHT	(1 << PC3)
+#define INPUT_BUTTON_START	(1 << PB0)
+#define INPUT_BUTTON_SELECT	(1 << PB2)
 
 //void input_registers_init();
 

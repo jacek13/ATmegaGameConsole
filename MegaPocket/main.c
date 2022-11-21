@@ -22,6 +22,8 @@ int main(void)
 	ILI9341_init(4);
 	Display_Clear_Screen(0x0000);
 	
+	//demoRTC(0);
+	demoPlaySounds();
 	//demoReadKeys();
 	TetrisRun();
 }

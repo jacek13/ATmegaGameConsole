@@ -148,12 +148,12 @@ ButtonType TetrisHandleInput(/*olc::PixelGameEngine* engine,*/ struct Tile * tet
 	//if (engine->GetKey(olc::G).bPressed) makeNewTile();
 	//if (engine->GetKey(olc::D).bPressed) drawCurrentTile();
 	#else
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_UP, PINB) && tetromino->y >= 1) ButtonSelect = 0, tetromino->y--, input = BUTTON_UP;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_DOWN, PINB) && tetromino->y < maxRows) ButtonSelect = 0, tetromino->y++, input = BUTTON_DOWN;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_LEFT, PINB) && tetromino->x >= 1) ButtonSelect = 0, tetromino->x--, input = BUTTON_LEFT;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_RIGHT, PINB)  && tetromino->x < maxColumns)ButtonSelect = 0, tetromino->x++, input = BUTTON_RIGHT;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_START, PINC)) input = BUTTON_RESET;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_SELECT, PINC) && !ButtonSelect) ButtonSelect = 1, input = BUTTON_ROTATE;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_UP, PINC) && tetromino->y >= 1) ButtonSelect = 0, tetromino->y--, input = BUTTON_UP;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_DOWN, PINC) && tetromino->y < maxRows) ButtonSelect = 0, tetromino->y++, input = BUTTON_DOWN;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_LEFT, PINC) && tetromino->x >= 1) ButtonSelect = 0, tetromino->x--, input = BUTTON_LEFT;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_RIGHT, PINC)  && tetromino->x < maxColumns)ButtonSelect = 0, tetromino->x++, input = BUTTON_RIGHT;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_START, PINB)) input = BUTTON_RESET;
+	/* Check Pin State */ if (read_key(INPUT_BUTTON_SELECT, PINB) && !ButtonSelect) ButtonSelect = 1, input = BUTTON_ROTATE;
 	else if (!read_key(INPUT_BUTTON_SELECT, PINC) && ButtonSelect) ButtonSelect = 0;
 	#endif
 	return input;

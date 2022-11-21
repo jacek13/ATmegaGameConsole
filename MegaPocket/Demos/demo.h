@@ -28,6 +28,8 @@ void demoRTC(uint8_t setCompileTime);
 
 void demoGenerateTones();
 
+void demoPlaySounds();
+
 void demoBrightness();
 
 void demoBaseTime();

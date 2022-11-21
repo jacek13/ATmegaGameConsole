@@ -142,6 +142,7 @@ inline void demoRTC(uint8_t setCompileTime)
 		sprintf(buffer, "Data: %2x.%2x.20%2x", date.DayOfMonth, date.Month, date.Year), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
 		sprintf(buffer, "Dzien tygodnia: %2x", date.DayOfWeek), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
 		sprintf(buffer, "Czas kompilacji: %s %s", __DATE__, __TIME__), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
 }
 
@@ -180,6 +181,7 @@ inline void demoGenerateTones()
 			OCR1A = 0;
 			_delay_ms(100);
 		}
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
 }
 
@@ -244,11 +246,63 @@ void demoReadKeys()
 	while(1)
 	{
 		//read_key(INPUT_BUTTON_SELECT, PINC)
-		sprintf(buffer, "Stan klawisza UP: '%1d'", read_key(INPUT_BUTTON_UP, PINB)), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Stan klawisza DOWN: '%1d'", read_key(INPUT_BUTTON_DOWN, PINB)), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Stan klawisza LEFT: '%1d'", read_key(INPUT_BUTTON_LEFT, PINB)), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Stan klawisza RIGHT: '%1d'", read_key(INPUT_BUTTON_RIGHT, PINB)), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Stan klawisza START: '%1.d'", read_key(INPUT_BUTTON_START, PINC)), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Stan klawisza SELECT: '%1d'", read_key(INPUT_BUTTON_SELECT, PINC)), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza UP: '%1d'", read_key(INPUT_BUTTON_UP, PINC)), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza DOWN: '%1d'", read_key(INPUT_BUTTON_DOWN, PINC)), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza LEFT: '%1d'", read_key(INPUT_BUTTON_LEFT, PINC)), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza RIGHT: '%1d'", read_key(INPUT_BUTTON_RIGHT, PINC)), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza START: '%1.d'", read_key(INPUT_BUTTON_START, PINB)), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Stan klawisza SELECT: '%1d'", read_key(INPUT_BUTTON_SELECT, PINB)), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
+	}
+}
+
+void demoPlaySounds()
+{
+	static char buffer[32] = {};
+		
+	// Set OC1A as output pin
+	DDRB = (1 << PB1);
+	TCCR1A = (1 << COM1A0);
+	TCCR1B = (1 << WGM12) | (1 << CS10);
+		
+	while(1)
+	{
+		sprintf(buffer, "Current note: C"), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_LEFT, PINC) ? 0xFE05 : 0x0000);
+		sprintf(buffer, "Current note: D"), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_UP, PINC) ? 0xFE05 : 0x0000);
+		sprintf(buffer, "Current note: E"), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_DOWN, PINC) ? 0xFE05 : 0x0000);
+		sprintf(buffer, "Current note: F"), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_RIGHT, PINC) ? 0xFE05 : 0x0000);
+		sprintf(buffer, "Current note: G"), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_START, PINB) ? 0xFE05 : 0x0000);
+		
+		if (read_key(INPUT_BUTTON_LEFT, PINC))
+		{
+			OCR1A = calculateOCRnA(notes[C1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_UP, PINC))
+		{
+			OCR1A = calculateOCRnA(notes[D1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_DOWN, PINC))
+		{
+			OCR1A = calculateOCRnA(notes[E1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_RIGHT, PINC))
+		{
+			OCR1A = calculateOCRnA(notes[F1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_START, PINB))
+		{
+			OCR1A = calculateOCRnA(notes[G1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_SELECT, PINB))
+		{
+			Display_Clear_Screen(0x0000); 
+			break;//OCR1A = calculateOCRnA(notes[A1], 8), continue;
+		}
+		//sprintf(buffer, "Current note: H", read_key(INPUT_BUTTON_SELECT, PINB)), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
+		OCR1A = 0;
 	}
 }
