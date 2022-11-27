@@ -23,7 +23,8 @@ int main(void)
 	Display_Clear_Screen(0x0000);
 	
 	//demoRTC(0);
-	demoPlaySounds();
+	//demoPlaySounds();
 	//demoReadKeys();
-	TetrisRun();
+	//TetrisRun();
+	systemRun();
 }

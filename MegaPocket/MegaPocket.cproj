@@ -212,6 +212,12 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="System\menu.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="System\menu.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="common\" />

@@ -24,16 +24,18 @@ void demoDisplaySetOfCharacters();
 
 void demoDynamicText();
 
-void demoRTC(uint8_t setCompileTime);
+uint8_t demoRTC(uint8_t setCompileTime);
 
 void demoGenerateTones();
 
-void demoPlaySounds();
+uint8_t demoPlaySounds();
 
 void demoBrightness();
 
 void demoBaseTime();
 
 void demoReadKeys();
+
+void systemRun();
 
 #endif /* DEMO_H_ */
