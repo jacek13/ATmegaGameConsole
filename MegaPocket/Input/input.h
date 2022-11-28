@@ -20,6 +20,32 @@
 
 //void input_registers_init();
 
+typedef enum buttonState
+{
+	BUTTON_RELEASED = 0,
+	BUTTON_FALLING_EDGE,
+	BUTTON_PRESSED,
+	BUTTON_RISING_EDGE
+} buttonState;
+
+typedef struct Button
+{
+	buttonState prevoiusState;
+	buttonState currentState;
+} Button;
+
+typedef struct Buttons
+{
+	Button ButtonUp;
+	Button ButtonDown;
+	Button ButtonLeft;
+	Button ButtonRight;
+	Button ButtonStart;
+	Button ButtonSelect;
+} Buttons;
+
 uint8_t read_key(uint8_t key, uint8_t pinRegister);
+
+void InputUpdateStates(struct Buttons * systemButtons);
 
 #endif /* INPUT_H_ */

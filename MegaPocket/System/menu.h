@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "../Input/input.h"
+
 typedef enum MenuStatusCode
 {
 	MENU_ERROR_WRONG_RANGES = -7,
@@ -38,7 +40,7 @@ typedef enum MenuNavigation
 
 struct MenuElement
 {
-	char* text;
+	const char* text;
 	int8_t (*application)();
 	int8_t rangeFrom;
 	uint8_t rangeTo;
@@ -61,6 +63,8 @@ struct Menu
 
 MenuStatusCode MenuAddElementAt(struct Menu* menu, uint8_t index, MenuElementType type, const char* text);
 
+MenuStatusCode MenuAVRSpecificAddElementAt(struct Menu* menu, uint8_t index, MenuElementType type, const char * text);
+
 MenuStatusCode MenuUpdateElementTextAt(struct Menu* menu, uint8_t index, const char* newText);
 
 MenuStatusCode MenuUpdateElementTypeAt(struct Menu* menu, uint8_t index, MenuElementType newType);
@@ -77,6 +81,8 @@ MenuStatusCode MenuUpdateElementRangesAt(struct Menu* menu, uint8_t index, int8_
 
 MenuStatusCode MenuFree(struct Menu* menu);
 
+MenuStatusCode MenuAVRSpecificFree(struct Menu* menu);
+
 #ifdef _MSC_VER
 void MenuDrawElementAt(struct MenuElement* element, uint8_t index, uint8_t cursorY, uint8_t drawInfo);
 #else
@@ -89,4 +95,4 @@ struct Menu* MenuCreateChild(struct Menu* parentMenu, uint8_t numberOfElements);
 
 struct Menu* MenuGetActiveMenu(struct Menu* menuBase);
 
-MenuNavigation MenuHandleInput(struct Menu* menu, char input);
+MenuNavigation MenuHandleInput(struct Menu* menu, struct Buttons * buttons);

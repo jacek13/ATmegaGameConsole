@@ -24,7 +24,7 @@ int main(void)
 	
 	//demoRTC(0);
 	//demoPlaySounds();
-	//demoReadKeys();
+	demoReadKeys();
 	//TetrisRun();
-	systemRun();
+	//systemRun();
 }

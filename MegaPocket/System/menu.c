@@ -1,5 +1,5 @@
 #include "menu.h"
-#include "../Input/input.h"
+//#include "../Input/input.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,6 +36,24 @@ MenuStatusCode MenuAddElementAt(struct Menu* menu, uint8_t index, MenuElementTyp
 	menu->elements[index]->rangeTo = 100;
 	menu->elements[index]->text = (char*) malloc((StringGetNumberOfCharacters(text) + 1) * sizeof(char));
 	StringCopyContent(text, menu->elements[index]->text, StringGetNumberOfCharacters(text) + 1);
+
+	return MENU_SUCCESS;
+}
+
+MenuStatusCode MenuAVRSpecificAddElementAt(struct Menu* menu, uint8_t index, MenuElementType type, const char * text)
+{
+	if (menu == NULL) return MENU_ERROR_NULLPTR;
+	if (menu->numberOfElements == 0) return MENU_ERROR_TOO_FEW_ELEMENTS;
+	if (index >= menu->numberOfElements) return MENU_ERROR_INDEX_OUT_OF_RANGE;
+
+	menu->elements[index] = (struct MenuElement*)malloc(sizeof(struct MenuElement));
+	menu->elements[index]->subMenu = NULL;
+	menu->elements[index]->application = NULL;
+	menu->elements[index]->numeric.positiveValues = 0;
+	menu->elements[index]->elementType = type;
+	menu->elements[index]->rangeFrom = 0;
+	menu->elements[index]->rangeTo = 100;
+	menu->elements[index]->text = text;
 
 	return MENU_SUCCESS;
 }
@@ -144,30 +162,45 @@ MenuStatusCode MenuFree(struct Menu* menu)
 	return MENU_SUCCESS;
 }
 
-MenuNavigation MenuHandleInput(struct Menu* menu, char input)
+MenuStatusCode MenuAVRSpecificFree(struct Menu* menu)
+{
+	if (menu == NULL) return MENU_ERROR_NULLPTR;
+
+	for (uint8_t i = 0; i < menu->numberOfElements; i++)
+	{
+		if (menu->elements[i]->subMenu != NULL) MenuFree(menu->elements[i]->subMenu);
+		free(menu->elements[i]);
+	}
+	free(menu->elements);
+	free(menu);
+
+	return MENU_SUCCESS;
+}
+
+MenuNavigation MenuHandleInput(struct Menu* menu, struct Buttons* buttons)
 {
 	if (menu == NULL) return MENU_NAVIGATE_NONE;
 	
-	#ifdef _MSC_VER
-	switch (input)
-	{
-		case 'w': return MENU_NAVIGATE_UP;		// UP
-		case 's': return MENU_NAVIGATE_DOWN;	// DOWN
-		case 'a': return MENU_NAVIGATE_LEFT;	// LEFT
-		case 'd': return MENU_NAVIGATE_RIGHT;	// RIGHT
-		case 'e': return MENU_NAVIGATE_START;	// START
-		case 'r': return MENU_NAVIGATE_SELECT;	// SELECT
-		default: return MENU_NAVIGATE_NONE;
-	} 
-	#else
-	if (read_key(INPUT_BUTTON_UP, PINC))	return MENU_NAVIGATE_UP;
-	if (read_key(INPUT_BUTTON_DOWN, PINC))	return MENU_NAVIGATE_DOWN;
-	if (read_key(INPUT_BUTTON_LEFT, PINC))	return MENU_NAVIGATE_LEFT;
-	if (read_key(INPUT_BUTTON_RIGHT, PINC))	return MENU_NAVIGATE_RIGHT;
-	if (read_key(INPUT_BUTTON_START, PINB))	return MENU_NAVIGATE_START;
-	if (read_key(INPUT_BUTTON_SELECT, PINB))return MENU_NAVIGATE_SELECT;
+	//#ifdef _MSC_VER
+	//switch (input)
+	//{
+	//	case 'w': return MENU_NAVIGATE_UP;		// UP
+	//	case 's': return MENU_NAVIGATE_DOWN;	// DOWN
+	//	case 'a': return MENU_NAVIGATE_LEFT;	// LEFT
+	//	case 'd': return MENU_NAVIGATE_RIGHT;	// RIGHT
+	//	case 'e': return MENU_NAVIGATE_START;	// START
+	//	case 'r': return MENU_NAVIGATE_SELECT;	// SELECT
+	//	default: return MENU_NAVIGATE_NONE;
+	//} 
+	//#else
+	if (buttons->ButtonUp.currentState == BUTTON_FALLING_EDGE)		return MENU_NAVIGATE_UP;
+	if (buttons->ButtonDown.currentState == BUTTON_FALLING_EDGE)	return MENU_NAVIGATE_DOWN;
+	if (buttons->ButtonLeft.currentState == BUTTON_FALLING_EDGE)	return MENU_NAVIGATE_LEFT;
+	if (buttons->ButtonRight.currentState == BUTTON_FALLING_EDGE)	return MENU_NAVIGATE_RIGHT;
+	if (buttons->ButtonStart.currentState == BUTTON_FALLING_EDGE)	return MENU_NAVIGATE_START;
+	if (buttons->ButtonSelect.currentState == BUTTON_FALLING_EDGE)	return MENU_NAVIGATE_SELECT;
 	return MENU_NAVIGATE_NONE;
-	#endif
+	//#endif
 }
 
 struct Menu* MenuGetActiveMenu(struct Menu* menuBase)
