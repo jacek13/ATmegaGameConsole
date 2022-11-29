@@ -15,6 +15,7 @@
 #include "../common/config.h"
 #include "../Input/input.h"
 #include "../System/menu.h"
+#include "../System/systemData.h"
 
 inline void demoRandomDisplayBitmapRandom()
 {
@@ -232,12 +233,6 @@ void demoBaseTime()
 	}
 }
 
-//ISR(TIMER0_OVF_vect)
-//{
-//	++numberOfTimer0Interupts;
-//	//TIFR0 = 0x01;
-//}
-
 void demoReadKeys()
 {
 	static char buffer[32] = {};
@@ -345,132 +340,4 @@ uint8_t demoPlaySounds()
 		OCR1A = 0;
 	}
 	return 0;
-}
-
-// MOVE ME LATER TO ANOTHER FILE
-const char menu_main_menu[]		PROGMEM = "Menu glowne";
-const char menu_apps[]			PROGMEM = "Gry";
-const char menu_settings[]		PROGMEM = "Ustawienia";
-const char menu_info[]			PROGMEM = "Info";
-const char menu_game_tetris[]	PROGMEM = "Tetris";
-const char menu_game_snake[]	PROGMEM = "Snake";
-const char menu_return[]		PROGMEM = "Wroc";
-const char menu_turn_sound[]	PROGMEM = "On/Off dzwiek";
-const char menu_turn_data[]		PROGMEM = "On/Off data";
-const char menu_brightness[]	PROGMEM = "Jasnosc";
-const char menu_compile_time[]	PROGMEM = __TIMESTAMP__;
-const char menu_author_name[]	PROGMEM = "Autor: Michal Jackowski";
-const char menu_hardware[]		PROGMEM = "Sprzet";
-const char menu_instruction[]	PROGMEM = "Instrukcja";
-const char menu_processor[]		PROGMEM = "Proc: ATmega328PU";
-const char menu_display[]		PROGMEM = "Display: WS240x320";
-const char menu_controller[]	PROGMEM = "Driver: ILI9341";
-const char menu_rtc[]			PROGMEM = "RTC: DS1307";
-const char menu_link_info[]		PROGMEM = "link:";
-const char menu_github_link[]	PROGMEM = "www.github.com/jacek13";
-
-inline void designMenu(struct Menu* menu)
-{
-	MenuStatusCode status = MENU_UNKNOWN;
-
-	// Main Menu
-	status = MenuAVRSpecificAddElementAt(menu, 0, MENU_INFORMATION, &menu_main_menu);
-	status = MenuAVRSpecificAddElementAt(menu, 1, MENU_SUBMENU, &menu_apps);
-	status = MenuAVRSpecificAddElementAt(menu, 2, MENU_SUBMENU, &menu_settings);
-	status = MenuAVRSpecificAddElementAt(menu, 3, MENU_SUBMENU, &menu_info);
-
-	// Submenu Games and applications
-	status = MenuAddSubMenuAt(menu, 1, 3);
-	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 0, MENU_RUN_APP, &menu_game_tetris);
-	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 1, MENU_RUN_APP, &menu_game_snake);
-	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 2, MENU_EXIT, &menu_return);
-	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 0, demoPlaySounds);
-	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 1, demoPlaySounds);
-
-	// Submenu Settings
-	status = MenuAddSubMenuAt(menu, 2, 4);
-	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 0, MENU_BOOL_SELECTION, &menu_turn_sound);
-	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 1, MENU_BOOL_SELECTION, &menu_turn_data);
-	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 2, MENU_INCREASE_DECREASE_VALUE, &menu_brightness);
-	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 3, MENU_EXIT, &menu_return);
-	status = MenuSetElementNumericalInitialValueAt(menu->elements[2]->subMenu, 0, 1);
-	status = MenuSetElementNumericalInitialValueAt(menu->elements[2]->subMenu, 1, 1);
-	status = MenuUpdateElementRangesAt(menu->elements[2]->subMenu, 2, 0, 100, 4);
-
-	// Sumbmenu About project
-	status = MenuAddSubMenuAt(menu, 3, 5);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu, 0, MENU_INFORMATION, &menu_compile_time);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu, 1, MENU_INFORMATION, &menu_author_name);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu, 2, MENU_SUBMENU, &menu_hardware);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu, 3, MENU_SUBMENU, &menu_instruction);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu, 4, MENU_EXIT, &menu_return);
-
-	// SubSubmenu specification
-	status = MenuAddSubMenuAt(menu->elements[3]->subMenu, 2, 5);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu->elements[2]->subMenu, 0, MENU_INFORMATION, &menu_processor);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu->elements[2]->subMenu, 1, MENU_INFORMATION, &menu_display);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu->elements[2]->subMenu, 2, MENU_INFORMATION, &menu_controller);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu->elements[2]->subMenu, 3, MENU_INFORMATION, &menu_rtc);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu->elements[2]->subMenu, 4, MENU_EXIT, &menu_return);
-
-	// SubSubmenu specification
-	status = MenuAddSubMenuAt(menu->elements[3]->subMenu, 3, 3);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu->elements[3]->subMenu, 0, MENU_INFORMATION, &menu_link_info);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu->elements[3]->subMenu, 1, MENU_INFORMATION, &menu_github_link);
-	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu->elements[3]->subMenu, 2, MENU_EXIT, &menu_return);
-}
-
-void systemRun()
-{
-	uint8_t numberOfElements = 4;
-
-	struct Menu* menu = MenuCreate(numberOfElements);
-	designMenu(menu);
-
-	uint16_t pointerDebug = 0xFFFF;
-	struct Menu* activeMenuHandler = menu;
-	struct Buttons systemButtons = {};
-	char menuChar = ' ';
-	static char bufferForProgmem[128] = {};
-	static char buffer[128] = {};
-		
-	do
-	{
-		//printf("\nStatus: %d\n", MenuUpdate(activeMenuHandler, MenuHandleInput(activeMenuHandler, input)));
-		//system("cls");
-		//MenuUpdate(activeMenuHandler, MenuHandleInput(activeMenuHandler, 'M'));
-		InputUpdateStates(&systemButtons);
-		MenuNavigation tmpDirection = MenuHandleInput(activeMenuHandler, &systemButtons);
-		if (tmpDirection != MENU_NAVIGATE_NONE)
-		{
-			Display_Clear_Screen(0x0000); 
-			
-			for (uint8_t i = 0; i < activeMenuHandler->numberOfElements; i++)
-			{
-				MenuUpdate(activeMenuHandler, tmpDirection);
-				//MenuDrawElementAt(activeMenuHandler->elements[i], i, activeMenuHandler->cursorY, 0, buffer);
-				//switch (activeMenuHandler->elements[i]->elementType)
-				//{
-				//	case MENU_INFORMATION:				  break;
-				//	case MENU_SUBMENU:					  break;
-				//	case MENU_RUN_APP:					  break;
-				//	case MENU_EXIT:						  break;
-				//	case MENU_BOOL_SELECTION:			  break;
-				//	case MENU_INCREASE_DECREASE_VALUE:	  break;
-				//	default:							  break;
-				//}
-				//pointerDebug = activeMenuHandler->elements[i]->text;
-				strcpy_P(bufferForProgmem, activeMenuHandler->elements[i]->text);
-				sprintf(buffer, "%s" , bufferForProgmem);
-				//if (i == activeMenuHandler->cursorY) Display_Draw_Text_From_Progmem(0, i * 16, PSTR("blablador <-"), consolas_font, 0xD800, 0x0000 );
-				//else Display_Draw_Text_From_Progmem(0, i * 16, PSTR("blablador"), consolas_font, 0xD800, 0x0000 );
-				
-				Display_Draw_Text(0, i * 16, buffer, consolas_font, 0xD800, activeMenuHandler->cursorY == i ? 0xFE05 : 0x0000);
-			}
-		}
-		////printf("CursorX = %2d\t| CursorY = %2d\n", activeMenuHandler->cursorX, activeMenuHandler->cursorY);
-		activeMenuHandler = MenuGetActiveMenu(activeMenuHandler);
-	} while (/*(input = _getch()) != 'q'*/ 1);
-
-	MenuAVRSpecificFree(menu);
 }

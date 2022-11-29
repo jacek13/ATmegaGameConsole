@@ -29,7 +29,7 @@ typedef enum MenuElementType
 
 typedef enum MenuNavigation
 {
-	MENU_NAVIGATE_UP,
+	MENU_NAVIGATE_UP = 0,
 	MENU_NAVIGATE_DOWN,
 	MENU_NAVIGATE_LEFT, 
 	MENU_NAVIGATE_RIGHT,

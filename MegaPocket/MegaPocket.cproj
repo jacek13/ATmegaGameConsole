@@ -161,6 +161,9 @@
     <Compile Include="Data\fonts.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Data\notes.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Data\notes.h">
       <SubType>compile</SubType>
     </Compile>
@@ -216,6 +219,18 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="System\menu.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="System\system.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="System\system.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="System\systemData.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="System\systemData.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

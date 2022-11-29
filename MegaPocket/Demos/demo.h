@@ -36,6 +36,4 @@ void demoBaseTime();
 
 void demoReadKeys();
 
-void systemRun();
-
 #endif /* DEMO_H_ */
