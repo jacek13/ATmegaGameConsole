@@ -44,7 +44,8 @@ typedef enum
 	BUTTON_DOWN,
 	BUTTON_LEFT,
 	BUTTON_RIGHT,
-	BUTTON_ROTATE
+	BUTTON_ROTATE,
+	BUTTON_RESET
 } ButtonType;
 
 struct Tile

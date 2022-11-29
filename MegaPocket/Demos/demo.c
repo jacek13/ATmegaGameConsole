@@ -13,6 +13,9 @@
 #include "../Data/notes.h"
 #include "../LcdDisplay/display.h"
 #include "../common/config.h"
+#include "../Input/input.h"
+#include "../System/menu.h"
+#include "../System/systemData.h"
 
 inline void demoRandomDisplayBitmapRandom()
 {
@@ -120,7 +123,7 @@ inline void demoDynamicText()
 	}
 }
 
-inline void demoRTC(uint8_t setCompileTime)
+inline uint8_t demoRTC(uint8_t setCompileTime)
 {
 	static DateTime date;
 	static char buffer[32] = {};
@@ -141,7 +144,9 @@ inline void demoRTC(uint8_t setCompileTime)
 		sprintf(buffer, "Data: %2x.%2x.20%2x", date.DayOfMonth, date.Month, date.Year), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
 		sprintf(buffer, "Dzien tygodnia: %2x", date.DayOfWeek), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
 		sprintf(buffer, "Czas kompilacji: %s %s", __DATE__, __TIME__), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
+	return 0;
 }
 
 static inline uint16_t calculateOCRnA(uint16_t noteFrequency, uint8_t prescaler)
@@ -179,6 +184,7 @@ inline void demoGenerateTones()
 			OCR1A = 0;
 			_delay_ms(100);
 		}
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
 }
 
@@ -227,8 +233,111 @@ void demoBaseTime()
 	}
 }
 
-//ISR(TIMER0_OVF_vect)
-//{
-//	++numberOfTimer0Interupts;
-//	//TIFR0 = 0x01;
-//}
+void demoReadKeys()
+{
+	static char buffer[32] = {};
+
+	uint8_t counterUP = 0;
+	uint8_t counterDOWN = 0;
+	uint8_t counterLEFT = 0;
+	uint8_t counterRIGHT = 0;
+	uint8_t counterSTART = 0;
+	uint8_t counterSELECT = 0;
+	struct Buttons systemButtons = {};
+	
+	sprintf(buffer, "UP FALLING_EDGE -> Licznik: '%3d'", counterUP), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
+	sprintf(buffer, "DOWN RISING_EDGE  -> Licznik: '%3d'", counterDOWN), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, 0x0000);
+	sprintf(buffer, "LEFT PRESSED      -> Licznik: '%3d'", counterLEFT), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
+	sprintf(buffer, "RIGHT RELEASED     -> Licznik: '%3d'", counterRIGHT), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
+	sprintf(buffer, "START FALLING_EDGE -> Licznik: '%3d'", counterSTART), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
+	sprintf(buffer, "SELECT RISING_EDGE  -> Licznik: '%3d'", counterSELECT), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
+		
+	while(1)
+	{
+		InputUpdateStates(&systemButtons);
+		
+		if (systemButtons.ButtonUp.currentState == BUTTON_FALLING_EDGE)
+		{
+			counterUP++;
+			sprintf(buffer, "UP FALLING_EDGE -> Licznik: '%3d'", counterUP), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
+		}
+		if (systemButtons.ButtonDown.currentState == BUTTON_RISING_EDGE)
+		{	
+			counterDOWN++;
+			sprintf(buffer, "DOWN RISING_EDGE  -> Licznik: '%3d'", counterDOWN), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, 0x0000);
+		}
+		if (systemButtons.ButtonLeft.currentState == BUTTON_PRESSED)
+		{
+			counterLEFT++;
+			sprintf(buffer, "LEFT PRESSED      -> Licznik: '%3d'", counterLEFT), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
+		}
+		if (systemButtons.ButtonRight.currentState == BUTTON_RELEASED)
+		{
+			counterRIGHT++;
+			sprintf(buffer, "RIGHT RELEASED     -> Licznik: '%3d'", counterRIGHT), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
+		}
+		if (systemButtons.ButtonStart.currentState == BUTTON_FALLING_EDGE)	
+		{
+			counterSTART++;
+			sprintf(buffer, "START FALLING_EDGE -> Licznik: '%3d'", counterSTART), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
+		}
+		if (systemButtons.ButtonSelect.currentState == BUTTON_RISING_EDGE)
+		{
+			counterSELECT++;
+			sprintf(buffer, "SELECT RISING_EDGE  -> Licznik: '%3d'", counterSELECT), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
+		}
+	}
+}
+
+uint8_t demoPlaySounds()
+{
+	static char buffer[32] = {};
+		
+	// Set OC1A as output pin
+	DDRB = (1 << PB1);
+	TCCR1A = (1 << COM1A0);
+	TCCR1B = (1 << WGM12) | (1 << CS10);
+		
+	while(1)
+	{
+		sprintf(buffer, "Current note: C"), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_LEFT, PINC) ? 0xFE05 : 0x0000);
+		sprintf(buffer, "Current note: D"), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_UP, PINC) ? 0xFE05 : 0x0000);
+		sprintf(buffer, "Current note: E"), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_DOWN, PINC) ? 0xFE05 : 0x0000);
+		sprintf(buffer, "Current note: F"), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_RIGHT, PINC) ? 0xFE05 : 0x0000);
+		sprintf(buffer, "Current note: G"), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_START, PINB) ? 0xFE05 : 0x0000);
+		
+		if (read_key(INPUT_BUTTON_LEFT, PINC))
+		{
+			OCR1A = calculateOCRnA(notes[C1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_UP, PINC))
+		{
+			OCR1A = calculateOCRnA(notes[D1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_DOWN, PINC))
+		{
+			OCR1A = calculateOCRnA(notes[E1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_RIGHT, PINC))
+		{
+			OCR1A = calculateOCRnA(notes[F1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_START, PINB))
+		{
+			OCR1A = calculateOCRnA(notes[G1], 8);
+			continue;
+		}
+		if (read_key(INPUT_BUTTON_SELECT, PINB))
+		{
+			Display_Clear_Screen(0x0000); 
+			break;//OCR1A = calculateOCRnA(notes[A1], 8), continue;
+		}
+		//sprintf(buffer, "Current note: H", read_key(INPUT_BUTTON_SELECT, PINB)), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
+		OCR1A = 0;
+	}
+	return 0;
+}
