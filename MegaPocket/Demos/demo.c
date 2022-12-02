@@ -17,19 +17,24 @@
 #include "../System/menu.h"
 #include "../System/systemData.h"
 
-inline void demoRandomDisplayBitmapRandom()
+uint8_t demoRandomDisplayBitmapRandom()
 {
 	static uint8_t i = 1;
+	
+	Display_Clear_Screen(0x0000);
 	while(1)
 	{
 		uint16_t randomNumber = random();
 		Display_Draw_Image_From_Progmem(randomNumber % (DISPLAY_WIDTH + 1 - 32), randomNumber % (DISPLAY_HEIGHT + 1 - 32), 32, 32, mario);
 		if (!++i) Display_Clear_Screen(0x0000);
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) { Display_Clear_Screen(0x0000); break; }
 	}
+	return 0;
 }
 
-inline void demoFillDisplayWithBitmaps()
+uint8_t demoFillDisplayWithBitmaps()
 {
+	Display_Clear_Screen(0x0000);
 	while(1)
 	{
 		for(uint8_t r = 0; r < 8; r++)
@@ -39,18 +44,23 @@ inline void demoFillDisplayWithBitmaps()
 		for(uint8_t r = 0; r < 8; r++)
 			for(uint8_t c = 0; c < 10; c++)
 				Display_Draw_Image_From_Progmem((uint16_t)c * 32,(uint8_t)r * 32, 32, 32, cili);
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) { Display_Clear_Screen(0x0000); break; }
 	}
+	return 0;
 }
 
-inline void demoText()
+uint8_t demoText()
 {
 	static uint8_t i = 1;
+	Display_Clear_Screen(0x0000);
 	while(1)
 	{
 		uint16_t randomNumber = random();
 		Display_Draw_Text_From_Progmem(randomNumber % (DISPLAY_WIDTH + 1 - 16), randomNumber % (DISPLAY_HEIGHT + 1 - 16), PSTR("ZBUDOWALISMY GO!"), consolas_font, 0xFFFF, randomNumber);
 		if (!++i) Display_Clear_Screen(0x0000), demoDisplaySetOfCharacters(), Display_Clear_Screen(0x0000);
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) { Display_Clear_Screen(0x0000); break; }
 	}
+	return 0;
 }
 
 inline void demoPixels()
@@ -64,11 +74,12 @@ inline void demoPixels()
 	}
 }
 
-inline void demoLines()
+uint8_t demoLines()
 {
 	static uint16_t x = DISPLAY_WIDTH;
 	static uint8_t y = 1;
 	
+	Display_Clear_Screen(0x0000);
 	while(1)
 	{
 		uint16_t randomNumber = random();
@@ -81,22 +92,31 @@ inline void demoLines()
 			Display_Draw_Line(0, 0, x-=8, DISPLAY_HEIGHT - 1, randomNumber);
 		}
 		if (x == 0) _delay_ms(2000), Display_Clear_Screen(0x0000), x = DISPLAY_WIDTH, y = 1;
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
+	Display_Clear_Screen(0x0000);
+	return 0;
 }
 
-inline void demoDisplaySetOfCharacters()
+uint8_t demoDisplaySetOfCharacters()
 {
-	Display_Draw_Text_From_Progmem(0, 0, PSTR("!#$%&'()*+,-./0123456789:;<=>?@[\]^_`{|}~"), consolas_font, 0xFFFF, 0x0000);
-	Display_Draw_Text_From_Progmem(0, 16, PSTR("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), consolas_font, 0xFFFF, 0x0000);
-	Display_Draw_Text_From_Progmem(0, 32, PSTR("abcdefghijklmnopqrstuvwxyz"), consolas_font, 0xFFFF, 0x0000);
-	Display_Draw_Text_From_Progmem(0, 64, PSTR("Demo wyswietla:"), consolas_font, 0xC700, 0x8170);
-	Display_Draw_Text_From_Progmem(0, 80, PSTR("* 255 razy bitmape 32x32 rgb565,"), consolas_font, 0xD800, 0x0000);
-	Display_Draw_Text_From_Progmem(0, 96, PSTR("* 255 razy ciag 16 znakow,"), consolas_font, 0xD800, 0x0000);
-	Display_Draw_Text_From_Progmem(0, 112, PSTR("* wypelnia ekran bitmapami 32x32."), consolas_font, 0xD800, 0x0000);
-	_delay_ms(3500);
+
+	while(1)
+	{
+		Display_Draw_Text_From_Progmem(0, 0, PSTR("!#$%&'()*+,-./0123456789:;<=>?@[\]^_`{|}~"), consolas_font, 0xFFFF, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 16, PSTR("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), consolas_font, 0xFFFF, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 32, PSTR("abcdefghijklmnopqrstuvwxyz"), consolas_font, 0xFFFF, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 64, PSTR("Demo wyswietla:"), consolas_font, 0xC700, 0x8170);
+		Display_Draw_Text_From_Progmem(0, 80, PSTR("* 255 razy bitmape 32x32 rgb565,"), consolas_font, 0xD800, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 96, PSTR("* 255 razy ciag 16 znakow,"), consolas_font, 0xD800, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 112, PSTR("* wypelnia ekran bitmapami 32x32."), consolas_font, 0xD800, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 128, PSTR("Wcisnij klawisz START aby kontynuowac"), consolas_font, 0xD800, 0x0000);
+		if (read_key(INPUT_BUTTON_START, PINB)) { Display_Clear_Screen(0x0000); break; }
+	}
+	return 0;
 }
 
-inline void demoDynamicText()
+uint8_t demoDynamicText()
 {
 	static char buffer[32] = {};
 	static char bufferRandomText[32] = {};
@@ -107,20 +127,23 @@ inline void demoDynamicText()
 	static uint8_t c = 0;
 	uint16_t randomNumber = random();
 	
+	Display_Clear_Screen(0x0000);
 	while(1)
 	{
-		sprintf(buffer, "Licznik I: %i   ", i), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Licznik J: %i   ", j), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Licznik K: %i   ", k), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(bufferRandomText, "Animacja: %c  ", animation[c++]), Display_Draw_Text(0, 48, bufferRandomText, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Losowa liczba: %i   ", randomNumber), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Licznik I: %3i", i), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Licznik J: %3i", j), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Licznik K: %3i", k), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
+		sprintf(bufferRandomText, "Animacja: %c", animation[c++]), Display_Draw_Text(0, 48, bufferRandomText, consolas_font, 0xD800, 0x0000);
+		sprintf(buffer, "Losowa liczba: %3i", randomNumber), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
 		
 		if (!++i) ++j;
 		if (j == 255) ++k;
 		if (k == 255) i = 1, j = k = 0;
 		if (c >= 4) c = 0;
 		randomNumber = random();
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) { Display_Clear_Screen(0x0000); break; }
 	}
+	return 0;
 }
 
 inline uint8_t demoRTC(uint8_t setCompileTime)
@@ -136,14 +159,15 @@ inline uint8_t demoRTC(uint8_t setCompileTime)
 		DS1307_Set_DateTime(&date);		
 	}
 	
+	Display_Clear_Screen(0x0000);
 	while(1)
 	{
 		DS1307_Get_DateTime(&date);
-		sprintf(buffer, "Komunikacja z DS1307 (I2C)"), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Godzina: %2x:%2x:%2x", date.Hour, date.Minute, date.Second), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Data: %2x.%2x.20%2x", date.DayOfMonth, date.Month, date.Year), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Dzien tygodnia: %2x", date.DayOfWeek), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
-		sprintf(buffer, "Czas kompilacji: %s %s", __DATE__, __TIME__), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 0, PSTR("Komunikacja z DS1307 (I2C)"), consolas_font, 0xD800, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 16, PSTR("Godzina: "), consolas_font, 0xD800, 0x0000), sprintf(buffer, "%2x:%2x:%2x", date.Hour, date.Minute, date.Second), Display_Draw_Text(10, 16, buffer, consolas_font, 0xD800, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 32, PSTR("Data: "), consolas_font, 0xD800, 0x0000), sprintf(buffer, "%2x.%2x.20%2x", date.DayOfMonth, date.Month, date.Year), Display_Draw_Text(7, 32, buffer, consolas_font, 0xD800, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 48, PSTR("Dzien tygodnia: "), consolas_font, 0xD800, 0x0000), sprintf(buffer, "%2x", date.DayOfWeek), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, 0x0000);
+		Display_Draw_Text_From_Progmem(0, 64, PSTR(__TIMESTAMP__), consolas_font, 0xD800, 0x0000);
 		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
 	return 0;
@@ -233,7 +257,7 @@ void demoBaseTime()
 	}
 }
 
-void demoReadKeys()
+uint8_t demoReadKeys()
 {
 	static char buffer[32] = {};
 
@@ -287,56 +311,70 @@ void demoReadKeys()
 			sprintf(buffer, "SELECT RISING_EDGE  -> Licznik: '%3d'", counterSELECT), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
 		}
 	}
+	return 0;
 }
 
 uint8_t demoPlaySounds()
 {
-	static char buffer[32] = {};
-		
+	Buttons demoButtons = {};
 	// Set OC1A as output pin
 	DDRB = (1 << PB1);
 	TCCR1A = (1 << COM1A0);
 	TCCR1B = (1 << WGM12) | (1 << CS10);
-		
+	
+	Display_Clear_Screen(0x0000);
 	while(1)
 	{
-		sprintf(buffer, "Current note: C"), Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_LEFT, PINC) ? 0xFE05 : 0x0000);
-		sprintf(buffer, "Current note: D"), Display_Draw_Text(0, 16, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_UP, PINC) ? 0xFE05 : 0x0000);
-		sprintf(buffer, "Current note: E"), Display_Draw_Text(0, 32, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_DOWN, PINC) ? 0xFE05 : 0x0000);
-		sprintf(buffer, "Current note: F"), Display_Draw_Text(0, 48, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_RIGHT, PINC) ? 0xFE05 : 0x0000);
-		sprintf(buffer, "Current note: G"), Display_Draw_Text(0, 64, buffer, consolas_font, 0xD800, read_key(INPUT_BUTTON_START, PINB) ? 0xFE05 : 0x0000);
+		InputUpdateStates(&demoButtons);
 		
-		if (read_key(INPUT_BUTTON_LEFT, PINC))
+		Display_Draw_Text_From_Progmem(0, 0, PSTR("Current note: C"), consolas_font, 0xD800, demoButtons.ButtonUp.currentState == BUTTON_PRESSED ? 0xFE05 : 0x0000);
+		Display_Draw_Text_From_Progmem(0, 16, PSTR("Current note: D"), consolas_font, 0xD800, demoButtons.ButtonDown.currentState == BUTTON_PRESSED ? 0xFE05 : 0x0000);
+		Display_Draw_Text_From_Progmem(0, 32, PSTR("Current note: E"), consolas_font, 0xD800, demoButtons.ButtonLeft.currentState == BUTTON_PRESSED ? 0xFE05 : 0x0000);
+		Display_Draw_Text_From_Progmem(0, 48, PSTR("Current note: F"), consolas_font, 0xD800, demoButtons.ButtonRight.currentState == BUTTON_PRESSED ? 0xFE05 : 0x0000);
+		Display_Draw_Text_From_Progmem(0, 64, PSTR("Current note: G"), consolas_font, 0xD800, demoButtons.ButtonStart.currentState == BUTTON_PRESSED ? 0xFE05 : 0x0000);
+		Display_Draw_Text_From_Progmem(0, 80, PSTR("Current note: H"), consolas_font, 0xD800, demoButtons.ButtonSelect.currentState == BUTTON_PRESSED ? 0xFE05 : 0x0000);
+		
+		if (demoButtons.ButtonStart.currentState == BUTTON_PRESSED && demoButtons.ButtonSelect.currentState == BUTTON_PRESSED)
+		{
+			OCR1A = 0;
+			Display_Clear_Screen(0x0000);
+			break;//OCR1A = calculateOCRnA(notes[A1], 8), continue;
+		}
+		if (demoButtons.ButtonUp.currentState == BUTTON_PRESSED)
 		{
 			OCR1A = calculateOCRnA(notes[C1], 8);
 			continue;
 		}
-		if (read_key(INPUT_BUTTON_UP, PINC))
+		if (demoButtons.ButtonUp.currentState == BUTTON_PRESSED)
+		{
+			OCR1A = calculateOCRnA(notes[C1], 8);
+			continue;
+		}
+		if (demoButtons.ButtonDown.currentState == BUTTON_PRESSED)
 		{
 			OCR1A = calculateOCRnA(notes[D1], 8);
 			continue;
 		}
-		if (read_key(INPUT_BUTTON_DOWN, PINC))
+		if (demoButtons.ButtonLeft.currentState == BUTTON_PRESSED)
 		{
 			OCR1A = calculateOCRnA(notes[E1], 8);
 			continue;
 		}
-		if (read_key(INPUT_BUTTON_RIGHT, PINC))
+		if (demoButtons.ButtonRight.currentState == BUTTON_PRESSED)
 		{
 			OCR1A = calculateOCRnA(notes[F1], 8);
 			continue;
 		}
-		if (read_key(INPUT_BUTTON_START, PINB))
+		if (demoButtons.ButtonStart.currentState == BUTTON_PRESSED)
 		{
 			OCR1A = calculateOCRnA(notes[G1], 8);
 			continue;
 		}
-		if (read_key(INPUT_BUTTON_SELECT, PINB))
+		if (demoButtons.ButtonSelect.currentState == BUTTON_PRESSED)
 		{
-			Display_Clear_Screen(0x0000); 
-			break;//OCR1A = calculateOCRnA(notes[A1], 8), continue;
+			OCR1A = calculateOCRnA(notes[A1], 8);
+			continue;
 		}
-		//sprintf(buffer, "Current note: H", read_key(INPUT_BUTTON_SELECT, PINB)), Display_Draw_Text(0, 80, buffer, consolas_font, 0xD800, 0x0000);
 		OCR1A = 0;
 	}
 	return 0;

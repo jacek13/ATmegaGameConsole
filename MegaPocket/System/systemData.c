@@ -12,8 +12,6 @@ const char menu_main_menu[]		PROGMEM = "Menu glowne";
 const char menu_apps[]			PROGMEM = "Gry i aplikacje";
 const char menu_settings[]		PROGMEM = "Ustawienia";
 const char menu_info[]			PROGMEM = "Info";
-const char menu_game_tetris[]	PROGMEM = "Tetris";
-const char menu_game_snake[]	PROGMEM = "Snake";
 const char menu_return[]		PROGMEM = "Wroc";
 const char menu_turn_sound[]	PROGMEM = "Wl/wyl dzwiek";
 const char menu_turn_data[]		PROGMEM = "Wl/wyl data";
@@ -41,3 +39,15 @@ const char menu_element_unknown[]	PROGMEM = "[UNK]";
 
 const char menu_true[]	PROGMEM = "true";
 const char menu_false[]	PROGMEM = "false";
+
+// Games
+const char menu_game_tetris[]	PROGMEM = "Tetris";
+const char menu_game_snake[]	PROGMEM = "Snake";
+
+// Applications
+const char menu_demo_Text[]		PROGMEM = "demo Text";
+const char menu_demo_RTC[]		PROGMEM = "demo RTC";
+const char menu_demo_Sounds[]	PROGMEM = "demo play sounds";
+const char menu_demo_dynamic_text[]		PROGMEM = "demo dynamic text";
+const char menu_demo_bitmaps[]	PROGMEM = "demo bitmaps";
+const char menu_demo_lines[]	PROGMEM = "demo draw lines";

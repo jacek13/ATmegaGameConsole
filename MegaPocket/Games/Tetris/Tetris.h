@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TETRIS_H_
+#define TETRIS_H_
 
 #include <stdio.h>
 
@@ -52,3 +53,5 @@ Tetromino generateTile();
 ButtonType TetrisHandleInput(/*olc::PixelGameEngine* engine,*/ struct Tile* tetromino, unsigned int maxRows, unsigned int maxColumns);
 
 collisionType TetrisCheckForCollision(struct Board* board, struct Tile* tetromino);
+
+#endif

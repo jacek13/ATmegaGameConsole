@@ -37,6 +37,7 @@ void TetrisRun()
 	struct Tile currentTetrominoCopy;
 	//float elapsedTimeSum = 0.0f;
 	TetrisInit(&board, &currentTetromino);
+	Display_Clear_Screen(0x0000);
 	TetrisDrawMap(/*engine,*/ &board);
 	TetrisDrawScore(board.score);
 	
@@ -83,16 +84,9 @@ void TetrisLoop(/*olc::PixelGameEngine* engine, */ struct Board* board, struct T
 		TetrisUpdateGameLogic(board, tetromino, elapsedTimeSum);
 	}
 
-	//TetrisDrawMap(/*engine,*/ board);
-	//sprintf_s(buffer, "Elapsed: %1.3f\tCurrent tetromino: %d\tFull row: %d\n", elapsedTimeSum += GetElapsedTime(), tetromino->Type, TetrisFindIndexOfFilledRow(&board));
-	//printf(buffer);
 	if ((tetromino->x != bufferTetromino->x) || (tetromino->y != bufferTetromino->y) || (tetromino->Type != bufferTetromino->Type)) TetrisDrawCurrentTile(/*engine,*/ tetromino, bufferTetromino, collision);
 	
 	if (board->score != bufferScore) TetrisDrawScore(board->score);
-	//bufferString.clear();
-	//bufferString += "Score: ";
-	//bufferString += std::to_string(board.score);
-	//DrawString(0, 226, bufferString);
 
 }
 
@@ -139,6 +133,8 @@ void TetrisFreeMemory(struct Board* board)
 ButtonType TetrisHandleInput(/*olc::PixelGameEngine* engine,*/ struct Tile * tetromino, unsigned int maxRows, unsigned int maxColumns)
 {
 	ButtonType input = BUTTON_NONE;
+	static Buttons buttons = {};
+	InputUpdateStates(&buttons);
 	#ifdef __cplusplus
 	/* Check Pin State */ if (engine->GetKey(olc::UP).bPressed && tetromino->y >= 1) tetromino->y--, input = BUTTON_UP;
 	/* Check Pin State */ if (engine->GetKey(olc::DOWN).bPressed && tetromino->y < maxRows) tetromino->y++, input = BUTTON_DOWN;
@@ -148,12 +144,13 @@ ButtonType TetrisHandleInput(/*olc::PixelGameEngine* engine,*/ struct Tile * tet
 	//if (engine->GetKey(olc::G).bPressed) makeNewTile();
 	//if (engine->GetKey(olc::D).bPressed) drawCurrentTile();
 	#else
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_UP, PINC) && tetromino->y >= 1) ButtonSelect = 0, tetromino->y--, input = BUTTON_UP;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_DOWN, PINC) && tetromino->y < maxRows) ButtonSelect = 0, tetromino->y++, input = BUTTON_DOWN;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_LEFT, PINC) && tetromino->x >= 1) ButtonSelect = 0, tetromino->x--, input = BUTTON_LEFT;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_RIGHT, PINC)  && tetromino->x < maxColumns)ButtonSelect = 0, tetromino->x++, input = BUTTON_RIGHT;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_START, PINB)) input = BUTTON_RESET;
-	/* Check Pin State */ if (read_key(INPUT_BUTTON_SELECT, PINB) && !ButtonSelect) ButtonSelect = 1, input = BUTTON_ROTATE;
+	//if (buttons.ButtonStart.currentState ==  BUTTON_FALLING_EDGE && buttons.ButtonSelect.currentState == BUTTON_FALLING_EDGE && !ButtonSelect) tetrisGameLoop = 0;
+	/* Check Pin State */ if (buttons.ButtonUp.currentState == BUTTON_PRESSED && tetromino->y >= 1) ButtonSelect = 0, tetromino->y--, input = BUTTON_UP;
+	/* Check Pin State */ if (buttons.ButtonDown.currentState == BUTTON_PRESSED && tetromino->y < maxRows) ButtonSelect = 0, tetromino->y++, input = BUTTON_DOWN;
+	/* Check Pin State */ if (buttons.ButtonLeft.currentState == BUTTON_FALLING_EDGE && tetromino->x >= 1) ButtonSelect = 0, tetromino->x--, input = BUTTON_LEFT;
+	/* Check Pin State */ if (buttons.ButtonRight.currentState == BUTTON_FALLING_EDGE  && tetromino->x < maxColumns)ButtonSelect = 0, tetromino->x++, input = BUTTON_RIGHT;
+	/* Check Pin State */ if (buttons.ButtonStart.currentState ==  BUTTON_FALLING_EDGE) input = BUTTON_RESET;
+	/* Check Pin State */ if (buttons.ButtonSelect.currentState == BUTTON_FALLING_EDGE && !ButtonSelect) ButtonSelect = 1, input = BUTTON_ROTATE;
 	else if (!read_key(INPUT_BUTTON_SELECT, PINC) && ButtonSelect) ButtonSelect = 0;
 	#endif
 	return input;

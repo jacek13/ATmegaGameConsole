@@ -5,7 +5,6 @@
  *  Author: Michal
  */ 
 
-
 #ifndef BITMAPS_H_
 #define BITMAPS_H_
 

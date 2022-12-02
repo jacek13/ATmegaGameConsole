@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MENU_H_
+#define MENU_H_
 
 #include <stdint.h>
 
@@ -96,3 +97,5 @@ struct Menu* MenuCreateChild(struct Menu* parentMenu, uint8_t numberOfElements);
 struct Menu* MenuGetActiveMenu(struct Menu* menuBase);
 
 MenuNavigation MenuHandleInput(struct Menu* menu, struct Buttons * buttons);
+
+#endif

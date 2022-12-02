@@ -5,7 +5,6 @@
  *  Author: Michal
  */ 
 
-
 #ifndef IIC_H_
 #define IIC_H_
 

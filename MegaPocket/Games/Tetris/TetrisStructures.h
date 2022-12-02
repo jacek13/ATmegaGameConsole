@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TETRISSTRUCTURES_H_
+#define TETRISSTRUCTURES_H_
 
 #define CubeWidth 8
 #define CubeHight 8
@@ -61,3 +62,5 @@ struct Board
 	unsigned int rows, columns;
 	long score;
 };
+
+#endif

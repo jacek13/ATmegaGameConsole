@@ -15,8 +15,6 @@ extern const char menu_main_menu[]		PROGMEM;
 extern const char menu_apps[]			PROGMEM; 
 extern const char menu_settings[]		PROGMEM; 
 extern const char menu_info[]			PROGMEM; 
-extern const char menu_game_tetris[]	PROGMEM; 
-extern const char menu_game_snake[]		PROGMEM; 
 extern const char menu_return[]			PROGMEM; 
 extern const char menu_turn_sound[]		PROGMEM; 
 extern const char menu_turn_data[]		PROGMEM; 
@@ -45,5 +43,17 @@ extern const char menu_element_unknown[]	PROGMEM;
 // Settings description
 extern const char menu_true[]			PROGMEM;
 extern const char menu_false[]			PROGMEM;
+
+// Games
+extern const char menu_game_tetris[]	PROGMEM;
+extern const char menu_game_snake[]		PROGMEM;
+
+// Demos
+extern const char menu_demo_Text[]		PROGMEM;
+extern const char menu_demo_RTC[]		PROGMEM;
+extern const char menu_demo_Sounds[]	PROGMEM;
+extern const char menu_demo_dynamic_text[]		PROGMEM;
+extern const char menu_demo_bitmaps[]	PROGMEM;
+extern const char menu_demo_lines[]	PROGMEM;
 
 #endif /* SYSTEMDATA_H_ */

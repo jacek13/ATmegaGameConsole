@@ -5,7 +5,6 @@
  *  Author: Michal
  */ 
 
-
 #ifndef NOTES_H_
 #define NOTES_H_
 

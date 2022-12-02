@@ -5,7 +5,6 @@
  *  Author: Michal
  */ 
 
-
 #ifndef SYSTEM_H_
 #define SYSTEM_H_
 

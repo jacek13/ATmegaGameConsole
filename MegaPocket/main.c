@@ -22,6 +22,6 @@ int main(void)
 	SPI_init();
 	ILI9341_init(4);
 	Display_Clear_Screen(0x0000);
-
+	
 	systemRun();
 }
