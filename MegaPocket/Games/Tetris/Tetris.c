@@ -22,6 +22,13 @@ volatile uint8_t ButtonSelect;
 
 inline Tetromino generateTile() { return (Tetromino)(random() % NumberOfTetrominos); }
 
+inline char GetTetrominosCharacter(uint8_t type, uint8_t index)
+{
+	static char buffer[20] = {};
+	strcpy_P(buffer, (char*)pgm_read_word(&(Tetrominos[type])));
+	return (char) buffer[index];
+}
+
 inline int isTetrominoType(char type)
 {
 	unsigned int i = 0;
@@ -29,8 +36,11 @@ inline int isTetrominoType(char type)
 	return 0;
 }
 
-void TetrisRun()
+uint8_t TetrisRun()
 {
+	numberOfTimer0Interupts = 0;
+	numberOfMiliseconds = 0;
+	numberOfMiliseconds = 0;
 	tetrisGameLoop = 1;
 	struct Board board;
 	struct Tile currentTetromino;
@@ -41,7 +51,7 @@ void TetrisRun()
 	TetrisDrawMap(/*engine,*/ &board);
 	TetrisDrawScore(board.score);
 	
-	static char buffer[32] = {};
+	static char buffer[24] = {};
 		
 	// set Timer0
 	TCNT0 = 0x00;
@@ -55,9 +65,11 @@ void TetrisRun()
 		if (numberOfMiliseconds >= 5) ++numberOfSeconds, numberOfMiliseconds = 0;
 		sprintf(buffer, "Time: %5d,%1d [s]", numberOfSeconds, numberOfMiliseconds << 1), Display_Draw_Text(0, 224, buffer, consolas_font, 0xD800, 0x0000);
 	}
+	TetrisFreeMemory(&board);
+	return 0;
 }
 
-void TetrisLoop(/*olc::PixelGameEngine* engine, */ struct Board* board, struct Tile* tetromino, struct Tile* bufferTetromino, uint8_t * elapsedTimeSum)
+void TetrisLoop(struct Board* board, struct Tile* tetromino, struct Tile* bufferTetromino, uint8_t * elapsedTimeSum)
 {
 	uint16_t bufferScore = board->score;
 	collisionType collision = COLLISION_NONE;
@@ -67,12 +79,13 @@ void TetrisLoop(/*olc::PixelGameEngine* engine, */ struct Board* board, struct T
 	bufferTetromino->colision = tetromino->colision;
 	bufferTetromino->Type = tetromino->Type;
 
-	if ((input = TetrisHandleInput(/*engine,*/ tetromino, board->rows, board->columns)) == BUTTON_ROTATE)
+	if ((input = TetrisHandleInput(tetromino, board->rows, board->columns)) == BUTTON_ROTATE)
 	{
 		tetromino->Type = TetrisRotateTetromino(tetromino->Type);
 		if (TetrisCheckForCollision(board, tetromino)) tetromino->Type = bufferTetromino->Type;
 	}
-	if (input == BUTTON_RESET) TetrisHandleGameOver(board, tetromino);
+	// TODO something strange happens when program shutdowns
+	//if (input == BUTTON_RESET) tetrisGameLoop = 0;
 	collision = TetrisHandleCollision(board, tetromino, input);
 	TetrisUpdateGameLogic(board, tetromino, elapsedTimeSum);
 
@@ -110,9 +123,13 @@ void TetrisMakeNewBoard(struct Board* board)
 
 void TetrisCleanBoard(struct Board* board)
 {
+	static char rowBuffer[16] = {};
 	for (unsigned int i = 0; i < board->rows + 1; i++)
 		for (unsigned int j = 0; j <= (board->columns + 1); j++)
-			board->area[i][j] = map[i][j];
+		{
+			strcpy_P(rowBuffer, (char*) pgm_read_word(&(map[i])));
+			board->area[i][j] = (char) rowBuffer[j];
+		}
 	board->score = 0;
 }
 
@@ -130,7 +147,7 @@ void TetrisFreeMemory(struct Board* board)
 	free(board->area);
 }
 
-ButtonType TetrisHandleInput(/*olc::PixelGameEngine* engine,*/ struct Tile * tetromino, unsigned int maxRows, unsigned int maxColumns)
+ButtonType TetrisHandleInput(struct Tile * tetromino, unsigned int maxRows, unsigned int maxColumns)
 {
 	ButtonType input = BUTTON_NONE;
 	static Buttons buttons = {};
@@ -188,8 +205,8 @@ collisionType TetrisCheckForCollision(struct Board* board, struct Tile* tetromin
 {
 	for (unsigned row = 0; row < 4; row++)
 		for (unsigned column = 0; column < 4; column++)
-			if (Tetrominos[tetromino->Type][((row * 4) + column)] == '#' ||
-				isTetrominoType(Tetrominos[tetromino->Type][((row * 4) + column)]))
+			if (GetTetrominosCharacter(tetromino->Type, ((row * 4) + column)) == '#' ||
+				isTetrominoType(GetTetrominosCharacter(tetromino->Type, ((row * 4) + column))))
 			{
 				switch (board->area[tetromino->y + row][tetromino->x + column])
 				{
@@ -281,11 +298,11 @@ void TetrisMapCurrentTileToArea(struct Board* board, struct Tile* tetromino)
 	for (unsigned i = 0; i < 4; i++)
 		for (unsigned j = 0; j < 4; j++)
 		{
-			if ((isTetrominoType(Tetrominos[tetromino->Type][((i * 4) + j)]))
+			if ((isTetrominoType(GetTetrominosCharacter(tetromino->Type, ((i * 4) + j))))
 				&& (tetromino->y + i) < board->rows
 				&& (tetromino->x + j) > 0
 				&& (tetromino->x + j) <= board->columns)
-				board->area[tetromino->y + i][tetromino->x + j] = Tetrominos[tetromino->Type][((i * 4) + j)];
+				board->area[tetromino->y + i][tetromino->x + j] = GetTetrominosCharacter(tetromino->Type, ((i * 4) + j));
 		}
 }
 
@@ -366,7 +383,7 @@ void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetro
 				default: color = olc::WHITE;
 					break;
 			}
-			if (isTetrominoType(Tetrominos[tetromino->Type][((row * 4) + column)]))
+			if (isTetrominoType(&Tetrominos[tetromino->Type][((row * 4) + column)]))
 				engine->FillRect((tetromino->x + column) * CubeWidth, (tetromino->y + row) * CubeHight, CubeWidth, CubeHight, color);
 		}
 	#else
@@ -375,7 +392,7 @@ void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetro
 	if (!collision)
 		for (unsigned row = 0; row < 4; row++)
 			for (unsigned column = 0; column < 4; column++)
-				if (isTetrominoType(Tetrominos[bufferTetromino->Type][((row * 4) + column)]))
+				if (isTetrominoType(GetTetrominosCharacter(bufferTetromino->Type, ((row * 4) + column))))
 					if ((bufferTetromino->x + column) > 0 && (bufferTetromino->x + column) <= 10 && (bufferTetromino->y + row) <= 19)
 						Display_Draw_Fill_Rect((bufferTetromino->x + column) * CubeWidth, (bufferTetromino->y + row) * CubeHight, CubeWidth, CubeHight, 0x0000);
 	
@@ -414,7 +431,7 @@ void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetro
 			default: color = 0xFFFF;
 				break;
 			}
-			if (isTetrominoType(Tetrominos[tetromino->Type][((row * 4) + column)]) && tetromino->x < 10)
+			if (isTetrominoType(GetTetrominosCharacter(tetromino->Type, ((row * 4) + column))) && tetromino->x < 10)
 				Display_Draw_Fill_Rect((tetromino->x + column) * CubeWidth, (tetromino->y + row) * CubeHight, CubeWidth, CubeHight, color);
 		}
 		#endif
@@ -422,13 +439,13 @@ void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetro
 
 void TetrisDrawScore(uint16_t score)
 {
-	static char buffer[32] = {};
+	static char buffer[20] = {};
 	sprintf(buffer, "Score: %5d    ", score), Display_Draw_Text(0, 208, buffer, consolas_font, 0xEFE0, 0x0000);
 }
 
 void TetrisHandleGameOver(struct Board* board, struct Tile* tetromino)
 {
-	static char buffer[32] = {};
+	static char buffer[20] = {};
 	Display_Draw_Text_From_Progmem(0, 192, PSTR("Game Over!"), consolas_font, 0xD800, 0x0000);
 	sprintf(buffer, "Final score: %5d", board->score), Display_Draw_Text(0, 208, buffer, consolas_font, 0xEFE0, 0x0000);
 	for(uint8_t n = 0; n < 64; n++)

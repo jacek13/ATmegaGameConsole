@@ -14,6 +14,7 @@
 #include "Demos/demo.h"
 #include "System/system.h"
 #include "Games/Tetris/Tetris.h"
+#include "Games/Snake/SnakeLogic.h"
 
 int main(void)
 {

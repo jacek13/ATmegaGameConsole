@@ -179,6 +179,33 @@
     <Compile Include="DS1307\rtc.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Games\Snake\SnakeBoardIO.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Games\Snake\SnakeBoardIO.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Games\Snake\SnakeData.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Games\Snake\SnakeData.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Games\Snake\SnakeDisplay.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Games\Snake\SnakeDisplay.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Games\Snake\SnakeLogic.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Games\Snake\SnakeLogic.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Games\Snake\SnakeStructures.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Games\Tetris\Tetris.c">
       <SubType>compile</SubType>
     </Compile>
@@ -241,6 +268,7 @@
     <Folder Include="Debug\" />
     <Folder Include="Demos\" />
     <Folder Include="DS1307\" />
+    <Folder Include="Games\Snake" />
     <Folder Include="Games\Tetris" />
     <Folder Include="ILI\" />
     <Folder Include="LcdDisplay\" />

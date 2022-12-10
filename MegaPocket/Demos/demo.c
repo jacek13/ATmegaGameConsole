@@ -27,7 +27,7 @@ uint8_t demoRandomDisplayBitmapRandom()
 		uint16_t randomNumber = random();
 		Display_Draw_Image_From_Progmem(randomNumber % (DISPLAY_WIDTH + 1 - 32), randomNumber % (DISPLAY_HEIGHT + 1 - 32), 32, 32, mario);
 		if (!++i) Display_Clear_Screen(0x0000);
-		if (read_key(INPUT_BUTTON_SELECT, PINB)) { Display_Clear_Screen(0x0000); break; }
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
 	return 0;
 }
@@ -44,7 +44,7 @@ uint8_t demoFillDisplayWithBitmaps()
 		for(uint8_t r = 0; r < 8; r++)
 			for(uint8_t c = 0; c < 10; c++)
 				Display_Draw_Image_From_Progmem((uint16_t)c * 32,(uint8_t)r * 32, 32, 32, cili);
-		if (read_key(INPUT_BUTTON_SELECT, PINB)) { Display_Clear_Screen(0x0000); break; }
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
 	return 0;
 }
@@ -58,7 +58,7 @@ uint8_t demoText()
 		uint16_t randomNumber = random();
 		Display_Draw_Text_From_Progmem(randomNumber % (DISPLAY_WIDTH + 1 - 16), randomNumber % (DISPLAY_HEIGHT + 1 - 16), PSTR("ZBUDOWALISMY GO!"), consolas_font, 0xFFFF, randomNumber);
 		if (!++i) Display_Clear_Screen(0x0000), demoDisplaySetOfCharacters(), Display_Clear_Screen(0x0000);
-		if (read_key(INPUT_BUTTON_SELECT, PINB)) { Display_Clear_Screen(0x0000); break; }
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
 	return 0;
 }
@@ -111,7 +111,7 @@ uint8_t demoDisplaySetOfCharacters()
 		Display_Draw_Text_From_Progmem(0, 96, PSTR("* 255 razy ciag 16 znakow,"), consolas_font, 0xD800, 0x0000);
 		Display_Draw_Text_From_Progmem(0, 112, PSTR("* wypelnia ekran bitmapami 32x32."), consolas_font, 0xD800, 0x0000);
 		Display_Draw_Text_From_Progmem(0, 128, PSTR("Wcisnij klawisz START aby kontynuowac"), consolas_font, 0xD800, 0x0000);
-		if (read_key(INPUT_BUTTON_START, PINB)) { Display_Clear_Screen(0x0000); break; }
+		if (read_key(INPUT_BUTTON_START, PINB)) break;
 	}
 	return 0;
 }
@@ -141,7 +141,7 @@ uint8_t demoDynamicText()
 		if (k == 255) i = 1, j = k = 0;
 		if (c >= 4) c = 0;
 		randomNumber = random();
-		if (read_key(INPUT_BUTTON_SELECT, PINB)) { Display_Clear_Screen(0x0000); break; }
+		if (read_key(INPUT_BUTTON_SELECT, PINB)) break;
 	}
 	return 0;
 }

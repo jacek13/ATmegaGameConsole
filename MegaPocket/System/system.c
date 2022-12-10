@@ -19,18 +19,20 @@ void designMenu(struct Menu* menu)
 	status = MenuAVRSpecificAddElementAt(menu, 3, MENU_SUBMENU, &menu_info);
 
 	// Submenu Games and applications
-	status = MenuAddSubMenuAt(menu, 1, 6);
+	status = MenuAddSubMenuAt(menu, 1, 7);
 	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 0, MENU_RUN_APP, &menu_game_tetris);
-	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 1, MENU_RUN_APP, &menu_demo_Sounds);
-	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 2, MENU_RUN_APP, &menu_demo_Text);
-	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 3, MENU_RUN_APP, &menu_demo_bitmaps);
-	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 4, MENU_RUN_APP, &menu_demo_lines);
-	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 5, MENU_EXIT, &menu_return);
+	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 1, MENU_RUN_APP, &menu_game_snake);
+	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 2, MENU_RUN_APP, &menu_demo_Sounds);
+	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 3, MENU_RUN_APP, &menu_demo_Text);
+	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 4, MENU_RUN_APP, &menu_demo_bitmaps);
+	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 5, MENU_RUN_APP, &menu_demo_lines);
+	status = MenuAVRSpecificAddElementAt(menu->elements[1]->subMenu, 6, MENU_EXIT, &menu_return);
 	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 0, TetrisRun);
-	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 1, demoPlaySounds);
-	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 2, demoText);
-	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 3, demoFillDisplayWithBitmaps);
-	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 4, demoLines);
+	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 1, SnakeRun);
+	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 2, demoPlaySounds);
+	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 3, demoText);
+	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 4, demoFillDisplayWithBitmaps);
+	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 5, demoLines);
 
 	// Submenu Settings
 	status = MenuAddSubMenuAt(menu, 2, 5);
@@ -121,6 +123,7 @@ void systemRun()
 	struct Menu* menu = MenuCreate(numberOfElements);
 	designMenu(menu);
 
+	MenuStatusCode menuStatus = MENU_UNKNOWN;
 	struct Menu* activeMenuHandler = menu;
 	struct MenuElement* localElement = NULL;
 	volatile struct Buttons systemButtons = {};
@@ -147,9 +150,22 @@ void systemRun()
 		DS1307_Get_DateTime(&date);
 		InputUpdateStates(&systemButtons);
 		MenuNavigation tmpDirection = MenuHandleInput(activeMenuHandler, &systemButtons);
-		MenuUpdate(activeMenuHandler, tmpDirection);
-		activeMenuHandler = MenuGetActiveMenu(activeMenuHandler); 
-		if (MenuCheckForInteractiveButtons(tmpDirection) && (tmpDirection == MENU_NAVIGATE_RIGHT || tmpDirection == MENU_NAVIGATE_LEFT)) Display_Clear_Screen(0x0000), MenuHandleSound(soundLength, currentNote = PAUSE, 1, enableSound);//, MenuHandleSound(soundLength, currentNote = PAUSE, 1);
+		
+		menuStatus = MenuUpdate(activeMenuHandler, tmpDirection);
+		switch (menuStatus)
+		{
+			case MENU_BOOL_CHANGED: MenuHandleSound(soundLength, currentNote = E1, 1, enableSound); break;
+			case MENU_VALUE_INCREASED: MenuHandleSound(soundLength, currentNote = A1, 1, enableSound); break;
+			case MENU_VALUE_DECREASED: MenuHandleSound(soundLength, currentNote = C1, 1, enableSound); break;
+			case MENU_RETURNED_FROM_APP:
+			case MENU_RETURNED_FROM_SUBMENU:
+			case MENU_ENTERED_SUBMENU:
+				Display_Clear_Screen(0x0000);
+				MenuHandleSound(soundLength, currentNote = PAUSE, 1, enableSound);
+				break;
+			default: break;
+		}
+		activeMenuHandler = MenuGetActiveMenu(activeMenuHandler);
 		if (tmpDirection != MENU_NAVIGATE_NONE)
 		{
 			for (uint8_t i = 0; i < activeMenuHandler->numberOfElements; i++)
@@ -163,13 +179,11 @@ void systemRun()
 					{
 						strcpy_P(bufferForSettingsValuesFromProgmem, MapMenuSettingsValue(localElement->numeric.positiveValues));
 						sprintf(buffer, "%s %s: %s%20c", bufferForDescriptionsFromProgmem, bufferForProgmem, bufferForSettingsValuesFromProgmem, ' ');
-						if ((tmpDirection == MENU_NAVIGATE_SELECT) || (tmpDirection == MENU_NAVIGATE_START)) MenuHandleSound(soundLength, currentNote = E1, 1, enableSound);
 					}
 					else if (localElement->elementType == MENU_INCREASE_DECREASE_VALUE)
 					{
 						sprintf(buffer, "%s %s: %d%20c", bufferForDescriptionsFromProgmem, bufferForProgmem, localElement->numeric.positiveNegativeValues, ' ');
 						Display_Set_Brightness(menu->elements[2]->subMenu->elements[3]->numeric.positiveValues);
-						if ((tmpDirection == MENU_NAVIGATE_SELECT) || (tmpDirection == MENU_NAVIGATE_START)) MenuHandleSound(soundLength, currentNote = G1, 1, enableSound);
 					}
 					else
 						sprintf(buffer, "%s %s%20c", bufferForDescriptionsFromProgmem, bufferForProgmem, ' ');
@@ -180,13 +194,11 @@ void systemRun()
 					{
 						strcpy_P(bufferForSettingsValuesFromProgmem, MapMenuSettingsValue(localElement->numeric.positiveValues));
 						sprintf(buffer, "%s: %s%20c", bufferForProgmem, bufferForSettingsValuesFromProgmem, ' ');
-						if ((tmpDirection == MENU_NAVIGATE_SELECT) || (tmpDirection == MENU_NAVIGATE_START)) MenuHandleSound(soundLength, currentNote = E1, 1, enableSound);
 					}
 					else if (localElement->elementType == MENU_INCREASE_DECREASE_VALUE)
 					{
 						sprintf(buffer, "%s: %d%20c", bufferForProgmem, localElement->numeric.positiveNegativeValues, ' ');
 						Display_Set_Brightness(menu->elements[2]->subMenu->elements[3]->numeric.positiveValues);
-						if ((tmpDirection == MENU_NAVIGATE_SELECT) || (tmpDirection == MENU_NAVIGATE_START)) MenuHandleSound(soundLength, currentNote = G1, 1, enableSound);
 					}
 					else
 						sprintf(buffer, "%s%20c", bufferForProgmem, ' ');
