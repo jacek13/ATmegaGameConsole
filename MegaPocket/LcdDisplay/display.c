@@ -111,7 +111,6 @@ inline void Display_Draw_Image_From_Progmem(uint16_t x, uint8_t y, uint16_t w, u
 	while(num8--) { SPI_Send_Byte(pgm_read_byte(img+1)); SPI_Send_Byte(pgm_read_byte(img+0)); img+=2; }
 
 	SBI(ILI9341_PORT, ILI9341_CS);//CS_IDLE;
-	//SPI_END; // W naszym przypadku tylko my korzystamy z magistrali SPI wiêc raczej nie trzeba jej wy³¹czaæ bo na p³ytce nie bêdzie innych elementów po³¹czonych z SPI
 }
 
 void Display_Draw_Text_From_Progmem(uint16_t x, uint8_t y, const char * text, const uint16_t * font, uint16_t fontColor, uint16_t backgroundColor)

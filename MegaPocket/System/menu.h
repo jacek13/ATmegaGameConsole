@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MENU_H_
+#define MENU_H_
 
 #include <stdint.h>
 
@@ -14,6 +15,12 @@ typedef enum MenuStatusCode
 	MENU_ERROR_NULLPTR = -2, 
 	MENU_ERROR_INDEX_OUT_OF_RANGE = -1, 
 	MENU_SUCCESS = 1,
+	MENU_RETURNED_FROM_APP,
+	MENU_RETURNED_FROM_SUBMENU,
+	MENU_ENTERED_SUBMENU,
+	MENU_VALUE_INCREASED,
+	MENU_VALUE_DECREASED,
+	MENU_BOOL_CHANGED,
 	MENU_UNKNOWN
 } MenuStatusCode;
 
@@ -96,3 +103,5 @@ struct Menu* MenuCreateChild(struct Menu* parentMenu, uint8_t numberOfElements);
 struct Menu* MenuGetActiveMenu(struct Menu* menuBase);
 
 MenuNavigation MenuHandleInput(struct Menu* menu, struct Buttons * buttons);
+
+#endif

@@ -14,6 +14,7 @@
 #include "Demos/demo.h"
 #include "System/system.h"
 #include "Games/Tetris/Tetris.h"
+#include "Games/Snake/SnakeLogic.h"
 
 int main(void)
 {
@@ -22,6 +23,6 @@ int main(void)
 	SPI_init();
 	ILI9341_init(4);
 	Display_Clear_Screen(0x0000);
-
+	
 	systemRun();
 }

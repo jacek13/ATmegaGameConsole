@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TETRIS_H_
+#define TETRIS_H_
 
 #include <stdio.h>
 
@@ -11,7 +12,7 @@
 #include "../../Input/input.h"
 #endif
 
-void TetrisRun();
+uint8_t TetrisRun();
 
 void TetrisLoop(/*olc::PixelGameEngine* engine, */ struct Board* board, struct Tile* tetromino, struct Tile* bufferTetromino, uint8_t* elapsedTimeSum);
 
@@ -52,3 +53,5 @@ Tetromino generateTile();
 ButtonType TetrisHandleInput(/*olc::PixelGameEngine* engine,*/ struct Tile* tetromino, unsigned int maxRows, unsigned int maxColumns);
 
 collisionType TetrisCheckForCollision(struct Board* board, struct Tile* tetromino);
+
+#endif

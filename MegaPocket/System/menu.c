@@ -231,7 +231,7 @@ inline MenuStatusCode MenuHandleSelectionInputs(struct Menu* menu, MenuNavigatio
 		case MENU_SUBMENU:
 			if (menu->elements[menu->cursorY]->elementType == MENU_SUBMENU && menu->elements[menu->cursorY]->elementType != NULL)
 			{
-				menu->cursorX++, status = MENU_SUCCESS;
+				menu->cursorX++, status = MENU_ENTERED_SUBMENU;
 				break;
 			}
 			status = MENU_ERROR_INDEX_OUT_OF_RANGE;	// RIGHT
@@ -243,20 +243,21 @@ inline MenuStatusCode MenuHandleSelectionInputs(struct Menu* menu, MenuNavigatio
 				break;
 			}
 			menu->elements[menu->cursorY]->application();
+			status = MENU_RETURNED_FROM_APP;
 			break;
 		case MENU_EXIT:
 			if (menu->parent != NULL)
 			{
 				menu->parent->cursorX = 0;
 				menu->cursorX--;
-				status = MENU_SUCCESS;
+				status = MENU_RETURNED_FROM_SUBMENU;
 				break;
 			}
 			status = MENU_ERROR_INDEX_OUT_OF_RANGE;
 			break;
 		case MENU_BOOL_SELECTION:
 			menu->elements[menu->cursorY]->numeric.positiveValues = !menu->elements[menu->cursorY]->numeric.positiveValues;
-			status = MENU_SUCCESS;
+			status = MENU_BOOL_CHANGED;
 			break;
 		case MENU_INCREASE_DECREASE_VALUE:
 			if (input == MENU_NAVIGATE_START)
@@ -264,7 +265,7 @@ inline MenuStatusCode MenuHandleSelectionInputs(struct Menu* menu, MenuNavigatio
 				if ((menu->elements[menu->cursorY]->numeric.positiveNegativeValues + 1) <= menu->elements[menu->cursorY]->rangeTo)
 				{
 					menu->elements[menu->cursorY]->numeric.positiveNegativeValues++;
-					status = MENU_SUCCESS;
+					status = MENU_VALUE_INCREASED;
 					break;
 				}
 			}
@@ -273,7 +274,7 @@ inline MenuStatusCode MenuHandleSelectionInputs(struct Menu* menu, MenuNavigatio
 				if ((menu->elements[menu->cursorY]->numeric.positiveNegativeValues - 1) >= menu->elements[menu->cursorY]->rangeFrom)
 				{
 					menu->elements[menu->cursorY]->numeric.positiveNegativeValues--;
-					status = MENU_SUCCESS;
+					status = MENU_VALUE_DECREASED;
 					break;
 				}
 			}
@@ -310,7 +311,7 @@ MenuStatusCode MenuUpdate(struct Menu* menu, MenuNavigation input)
 			{
 				menu->parent->cursorX = 0;
 				menu->cursorX--;
-				status = MENU_SUCCESS;
+				status = MENU_RETURNED_FROM_SUBMENU;
 				break;
 			}
 			status = MENU_ERROR_INDEX_OUT_OF_RANGE;
@@ -318,7 +319,7 @@ MenuStatusCode MenuUpdate(struct Menu* menu, MenuNavigation input)
 		case MENU_NAVIGATE_RIGHT:
 			if (menu->elements[menu->cursorY]->elementType == MENU_SUBMENU && menu->elements[menu->cursorY]->elementType != NULL)
 			{
-				menu->cursorX++, status = MENU_SUCCESS;
+				menu->cursorX++, status = MENU_ENTERED_SUBMENU;
 				break;
 			}
 			status = MENU_ERROR_INDEX_OUT_OF_RANGE;

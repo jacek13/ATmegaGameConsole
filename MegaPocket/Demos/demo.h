@@ -10,19 +10,19 @@
 
 #include <avr/io.h>
 
-void demoRandomDisplayBitmapRandom();
+uint8_t demoRandomDisplayBitmapRandom();
 
-void demoFillDisplayWithBitmaps();
+uint8_t demoFillDisplayWithBitmaps();
 
-void demoText();
+uint8_t demoText();
 
 void demoPixels();
 
-void demoLines();
+uint8_t demoLines();
 
-void demoDisplaySetOfCharacters();
+uint8_t demoDisplaySetOfCharacters();
 
-void demoDynamicText();
+uint8_t demoDynamicText();
 
 uint8_t demoRTC(uint8_t setCompileTime);
 
@@ -34,6 +34,6 @@ void demoBrightness();
 
 void demoBaseTime();
 
-void demoReadKeys();
+uint8_t demoReadKeys();
 
 #endif /* DEMO_H_ */
