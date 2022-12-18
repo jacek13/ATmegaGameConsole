@@ -149,7 +149,8 @@ inline void ILI9341_init(uint8_t brightness)
 
 inline void ILI9341_Write_Word_Multiple_Times(uint16_t color, uint16_t numberOfWords)
 {
-	while(numberOfWords--) SPI_Send_Word(color >> 8, color);
+	SPI_Send_Word_N(color >> 8, color, numberOfWords);
+	//while(numberOfWords--) SPI_Send_Word(color >> 8, color);
 }
 
 /** Sets cursor and after that, enables writing to gram*/
