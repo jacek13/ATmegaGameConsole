@@ -5,6 +5,7 @@
 #include "TetrisData.h"
 
 //#define random() rand()
+#define TETRIS_DISPLAY_OFFSET ((DISPLAY_WIDTH >> 1) - 6 * CubeWidth)
 
 // Time base
 volatile uint8_t numberOfTimer0Interupts;
@@ -327,17 +328,17 @@ void TetrisDrawMap(/*olc::PixelGameEngine* engine, */ struct Board* board)
 				case 'S': engine->FillRect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, olc::BLUE); break;
 				case 'Z': engine->FillRect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, olc::VERY_DARK_YELLOW); break;
 				#else
-				case 'W': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xD000); break;
-				case 'F': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xD000); break;
-				case ' ': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x0000); break;
-				case '#': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x05BF); break;
-				case 'I': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xFFFF); break;
-				case 'T': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xF29D); break;
-				case 'O': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x3F0A); break;
-				case 'L': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x9CD3); break;
-				case 'J': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xEFE0); break;
-				case 'S': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x05BF); break;
-				case 'Z': Display_Draw_Fill_Rect(j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x8CE0); break;
+				case 'W': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xD000); break;
+				case 'F': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xD000); break;
+				case ' ': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x0000); break;
+				case '#': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x05BF); break;
+				case 'I': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xFFFF); break;
+				case 'T': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xF29D); break;
+				case 'O': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x3F0A); break;
+				case 'L': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x9CD3); break;
+				case 'J': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0xEFE0); break;
+				case 'S': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x05BF); break;
+				case 'Z': Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + j * CubeWidth, i * CubeHight, CubeWidth, CubeHight, 0x8CE0); break;
 				#endif
 				default: break;
 			}
@@ -394,7 +395,7 @@ void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetro
 			for (unsigned column = 0; column < 4; column++)
 				if (isTetrominoType(GetTetrominosCharacter(bufferTetromino->Type, ((row * 4) + column))))
 					if ((bufferTetromino->x + column) > 0 && (bufferTetromino->x + column) <= 10 && (bufferTetromino->y + row) <= 19)
-						Display_Draw_Fill_Rect((bufferTetromino->x + column) * CubeWidth, (bufferTetromino->y + row) * CubeHight, CubeWidth, CubeHight, 0x0000);
+						Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + (bufferTetromino->x + column) * CubeWidth, (bufferTetromino->y + row) * CubeHight, CubeWidth, CubeHight, 0x0000);
 	
 	uint16_t color = 0xFFFF;
 	for (unsigned row = 0; row < 4; row++)
@@ -432,7 +433,7 @@ void TetrisDrawCurrentTile(/*olc::PixelGameEngine* engine, */ struct Tile* tetro
 				break;
 			}
 			if (isTetrominoType(GetTetrominosCharacter(tetromino->Type, ((row * 4) + column))) && tetromino->x < 10)
-				Display_Draw_Fill_Rect((tetromino->x + column) * CubeWidth, (tetromino->y + row) * CubeHight, CubeWidth, CubeHight, color);
+				Display_Draw_Fill_Rect(TETRIS_DISPLAY_OFFSET + (tetromino->x + column) * CubeWidth, (tetromino->y + row) * CubeHight, CubeWidth, CubeHight, color);
 		}
 		#endif
 }

@@ -35,17 +35,28 @@ void designMenu(struct Menu* menu)
 	status = MenuSetElementAppPointerAt(menu->elements[1]->subMenu, 5, demoLines);
 
 	// Submenu Settings
-	status = MenuAddSubMenuAt(menu, 2, 5);
+	status = MenuAddSubMenuAt(menu, 2, 6);
 	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 0, MENU_BOOL_SELECTION, &menu_turn_sound);
 	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 1, MENU_BOOL_SELECTION, &menu_turn_data);
 	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 2, MENU_BOOL_SELECTION, &menu_turn_info);
 	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 3, MENU_INCREASE_DECREASE_VALUE, &menu_brightness);
-	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 4, MENU_EXIT, &menu_return);
+	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 4, MENU_SUBMENU, &menu_set_rgb565);
+	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu, 5, MENU_EXIT, &menu_return);
 	status = MenuSetElementNumericalInitialValueAt(menu->elements[2]->subMenu, 0, 0);
 	status = MenuSetElementNumericalInitialValueAt(menu->elements[2]->subMenu, 1, 1);
 	status = MenuSetElementNumericalInitialValueAt(menu->elements[2]->subMenu, 2, 1);
 	status = MenuUpdateElementRangesAt(menu->elements[2]->subMenu, 3, 0, 100, 4);
-
+	
+	// Submenu for setting rgb565 
+	status = MenuAddSubMenuAt(menu->elements[2]->subMenu, 4, 4);
+	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu->elements[4]->subMenu, 0, MENU_INCREASE_DECREASE_VALUE, &menu_set_rgb565_R);
+	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu->elements[4]->subMenu, 1, MENU_INCREASE_DECREASE_VALUE, &menu_set_rgb565_G);
+	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu->elements[4]->subMenu, 2, MENU_INCREASE_DECREASE_VALUE, &menu_set_rgb565_B);
+	status = MenuAVRSpecificAddElementAt(menu->elements[2]->subMenu->elements[4]->subMenu, 3, MENU_EXIT, &menu_return);
+	status = MenuUpdateElementRangesAt(menu->elements[2]->subMenu->elements[4]->subMenu, 0, 0, 31, 27);
+	status = MenuUpdateElementRangesAt(menu->elements[2]->subMenu->elements[4]->subMenu, 1, 0, 63, 0);
+	status = MenuUpdateElementRangesAt(menu->elements[2]->subMenu->elements[4]->subMenu, 2, 0, 31, 0);
+	
 	// Sumbmenu About project
 	status = MenuAddSubMenuAt(menu, 3, 5);
 	status = MenuAVRSpecificAddElementAt(menu->elements[3]->subMenu, 0, MENU_INFORMATION, &menu_compile_time);
@@ -118,10 +129,15 @@ void systemRun()
 	uint8_t numberOfElements = 4;
 	uint8_t enableSound = 0;
 	uint16_t soundLength = 4;		// number of loops
+	uint16_t fontColor = 0;
 	NoteIndex currentNote = C1;
 
 	struct Menu* menu = MenuCreate(numberOfElements);
 	designMenu(menu);
+	uint8_t color_R = menu->elements[2]->subMenu->elements[4]->subMenu->elements[0]->numeric.positiveValues;
+	uint8_t color_G = menu->elements[2]->subMenu->elements[4]->subMenu->elements[1]->numeric.positiveValues;
+	uint8_t color_B = menu->elements[2]->subMenu->elements[4]->subMenu->elements[2]->numeric.positiveValues;
+	fontColor = (color_R << 11) | (color_G << 6) | (color_B);
 
 	MenuStatusCode menuStatus = MENU_UNKNOWN;
 	struct Menu* activeMenuHandler = menu;
@@ -155,8 +171,20 @@ void systemRun()
 		switch (menuStatus)
 		{
 			case MENU_BOOL_CHANGED: MenuHandleSound(soundLength, currentNote = E1, 1, enableSound); break;
-			case MENU_VALUE_INCREASED: MenuHandleSound(soundLength, currentNote = A1, 1, enableSound); break;
-			case MENU_VALUE_DECREASED: MenuHandleSound(soundLength, currentNote = C1, 1, enableSound); break;
+			case MENU_VALUE_INCREASED: 
+				MenuHandleSound(soundLength, currentNote = A1, 1, enableSound);
+				color_R = menu->elements[2]->subMenu->elements[4]->subMenu->elements[0]->numeric.positiveValues;
+				color_G = menu->elements[2]->subMenu->elements[4]->subMenu->elements[1]->numeric.positiveValues;
+				color_B = menu->elements[2]->subMenu->elements[4]->subMenu->elements[2]->numeric.positiveValues;
+				fontColor = (color_R << 11) | (color_G << 6) | (color_B);
+				break;
+			case MENU_VALUE_DECREASED: 
+				MenuHandleSound(soundLength, currentNote = C1, 1, enableSound); 
+				color_R = menu->elements[2]->subMenu->elements[4]->subMenu->elements[0]->numeric.positiveValues;
+				color_G = menu->elements[2]->subMenu->elements[4]->subMenu->elements[1]->numeric.positiveValues;
+				color_B = menu->elements[2]->subMenu->elements[4]->subMenu->elements[2]->numeric.positiveValues;
+				fontColor = (color_R << 11) | (color_G << 6) | (color_B);
+				break;
 			case MENU_RETURNED_FROM_APP:
 			case MENU_RETURNED_FROM_SUBMENU:
 			case MENU_ENTERED_SUBMENU:
@@ -203,18 +231,18 @@ void systemRun()
 					else
 						sprintf(buffer, "%s%20c", bufferForProgmem, ' ');
 				}
-				Display_Draw_Text(0, (i + 1) * 16, buffer, consolas_font, 0xD800, activeMenuHandler->cursorY == i ? 0x1808 : 0x0000);
+				Display_Draw_Text(0, (i + 1) * 16, buffer, consolas_font, fontColor, activeMenuHandler->cursorY == i ? 0x1808 : 0x0000);
 			}
 		}
 		if (menu->elements[2]->subMenu->elements[1]->numeric.positiveValues)
 		{
 			sprintf(buffer, "System time: %2x:%2x:%2x %2x.%2x.20%2x", date.Hour, date.Minute, date.Second, date.DayOfMonth, date.Month, date.Year);
-			Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
+			Display_Draw_Text(0, 0, buffer, consolas_font, fontColor, 0x0000);
 		}
 		else // TODO make PROGMEM STRING FOR CLEARING TEXT ROW || use draw rect for it
 		{
 			sprintf(buffer, "%40c", ' ');
-			Display_Draw_Text(0, 0, buffer, consolas_font, 0xD800, 0x0000);
+			Display_Draw_Text(0, 0, buffer, consolas_font, fontColor, 0x0000);
 		}
 		MenuHandleSound(soundLength, currentNote, 0, enableSound);
 	} while (1);

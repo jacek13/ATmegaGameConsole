@@ -28,6 +28,12 @@ const char menu_rtc[]			PROGMEM = "Zegar RTC: DS1307";
 const char menu_link_info[]		PROGMEM = "Repozytorium projektu:";
 const char menu_github_link[]	PROGMEM = "www.github.com/jacek13";
 
+// RGB565 settings
+extern const char menu_set_rgb565[]		PROGMEM = "Kolor czcionki";
+extern const char menu_set_rgb565_R[]	PROGMEM = "Kanal R";
+extern const char menu_set_rgb565_G[]	PROGMEM = "Kanal G";
+extern const char menu_set_rgb565_B[]	PROGMEM = "Kanal B";
+
 // Menu Element type acronyms
 const char menu_element_info[]		PROGMEM = "[INF]";
 const char menu_element_submenu[]	PROGMEM = "[SUB]";

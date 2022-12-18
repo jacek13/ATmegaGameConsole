@@ -47,6 +47,10 @@ static uint16_t Local_Mul(uint16_t a, uint8_t b)
 	return a * b;
 }
 
+// Dla debuga powy¿sza sztuczka dzia³a, natomiast wy¿sze poziomy optymalizaji nadal próbuj¹ ¿onglowaæ rejestrami co doprowadza do b³êdu kompilatora
+//#pragma GCC push_oprions
+//#pragma GCC optimize ("O0")
+
 void Snake_draw_clear_food(struct SnakeBoard* board, struct food* foodData)
 {
 	Display_Draw_Fill_Rect(Local_Mul(foodData->x, board->blockWidth), (foodData->y * board->blockHeight), board->blockWidth, board->blockHeight, SNAKE_RGB565_HEAD);
@@ -84,3 +88,5 @@ void Snake_draw_score(struct snake_element* pHead, struct SnakeBoard* board, int
 		pNew = pNew->next_element;
 	}
 }
+
+//#pragma GCC pop_options

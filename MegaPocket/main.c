@@ -21,8 +21,12 @@ int main(void)
 	uint8_t i = 1;
 	
 	SPI_init();
-	ILI9341_init(4);
+	ILI9341_init(2);
 	Display_Clear_Screen(0x0000);
 	
+	// For final version (Noise problem)
+	DDRD &= ~(1 << PD3);
+	PORTD &= ~(1 << PD3);
+	//demoRTC(1);
 	systemRun();
 }

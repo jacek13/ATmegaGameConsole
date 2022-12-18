@@ -31,6 +31,12 @@ extern const char menu_rtc[]			PROGMEM;
 extern const char menu_link_info[]		PROGMEM; 
 extern const char menu_github_link[]	PROGMEM;
 
+// RGB565 settings
+extern const char menu_set_rgb565[]		PROGMEM;
+extern const char menu_set_rgb565_R[]	PROGMEM;
+extern const char menu_set_rgb565_G[]	PROGMEM;
+extern const char menu_set_rgb565_B[]	PROGMEM;
+
 // Menu Element type acronyms
 extern const char menu_element_info[]		PROGMEM;
 extern const char menu_element_submenu[]	PROGMEM;
