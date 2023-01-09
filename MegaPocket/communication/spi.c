@@ -72,6 +72,26 @@ inline void SPI_Send_Word(uint8_t MSByte, uint8_t LSByte)
 	#endif
 }
 
+void SPI_Send_Word_N(uint8_t MSByte, uint8_t LSByte, uint16_t numberOfWords)
+{
+	#ifdef USE_HARDWARE_SPI
+	//TODO not implemented
+	//SPDR = byte;
+	//while(!(SPSR & (1 << SPIF)));
+	#else if USE_USART_MSPIM
+	UCSR0A = (1 << TXC0);
+	
+	for(uint16_t i = 0; i < numberOfWords; i++)
+	{
+		while(!(UCSR0A & _BV(UDRE0)));
+		UDR0 = MSByte;
+		while(!(UCSR0A & _BV(UDRE0)));
+		UDR0 = LSByte;
+	}
+	while(!(UCSR0A & (1 << TXC0)));
+	#endif
+}
+
 inline void SPI_Send_Byte_Array(uint8_t * array, uint16_t size)
 {
 	#ifdef USE_HARDWARE_SPI

@@ -20,6 +20,8 @@ void SPI_Send_Byte(uint8_t byte);
 
 void SPI_Send_Word(uint8_t MSByte, uint8_t LSByte);
 
+void SPI_Send_Word_N(uint8_t MSByte, uint8_t LSByte, uint16_t numberOfWords);
+
 void SPI_Send_Byte_Array(uint8_t * array, uint16_t size);
 
 void SPI_Send_Word_Array(uint8_t * array, uint16_t size);

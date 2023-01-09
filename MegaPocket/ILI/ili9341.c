@@ -49,12 +49,13 @@ inline void ILI9341_Write_Data_Word(uint16_t data)
 
 inline void ILI9341_init(uint8_t brightness)
 {
-	if (brightness)
-	{
-		TCCR2A = (1 << COM2B1) | (1 << WGM21) | (1 << WGM20);
-		TCCR2B = (1 << WGM22) | (1 << CS21);
-		OCR2A = brightness;
-	}
+	// TODO REFACTOR! (something make noise on board)
+	//if (brightness)
+	//{
+	//	TCCR2A = (1 << COM2B1) | (1 << WGM21) | (1 << WGM20);
+	//	TCCR2B = (1 << WGM22) | (1 << CS22) |(1 << CS21) /*| (1 << CS20)*/;
+	//	OCR2A = brightness;
+	//}
 	
 	//ILI9341_Write_Command(ILI9341_RESET);
 	ILI9341_Reset();
@@ -148,7 +149,8 @@ inline void ILI9341_init(uint8_t brightness)
 
 inline void ILI9341_Write_Word_Multiple_Times(uint16_t color, uint16_t numberOfWords)
 {
-	while(numberOfWords--) SPI_Send_Word(color >> 8, color);
+	SPI_Send_Word_N(color >> 8, color, numberOfWords);
+	//while(numberOfWords--) SPI_Send_Word(color >> 8, color);
 }
 
 /** Sets cursor and after that, enables writing to gram*/
@@ -176,5 +178,5 @@ inline void ILI9341_Set_Cursor_Optimized(uint16_t xs, uint16_t ys, uint16_t xe, 
 
 void ILI9341_Set_Brihness(uint8_t brightness)
 {
-	OCR2A = brightness;
+	//OCR2A = brightness;
 }
