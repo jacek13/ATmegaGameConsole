@@ -13,6 +13,10 @@ Repository contains my engineering degree project which theme was **`Portable po
 
 # Games and applications
 
+![](/resources/gifs/tetris.gif)
+
+![](/resources/gifs/snake.gif)
+
 The repository contains examples showing the capabilities of the device in the **`Demo`** and **`Games`** folders. Current programs:
 * **Tetris**,
 * **[Snake (based on my another project)](https://github.com/jacek13/Snake-game-AVR-ATmega328P)**,
@@ -22,6 +26,8 @@ The repository contains examples showing the capabilities of the device in the *
 * demoDynamicText(),
 * demoRTC(uint8_t setCompileTime),
 * demoPlaySounds(),
+
+![](/resources/gifs/demos.gif)
 
 # Hardware
 
